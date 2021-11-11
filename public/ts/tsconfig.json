@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "ES6",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Classic",
+    "outDir": "dist",
+    "baseUrl": ".",
+  },
+  "include": ["src/**/*", "types"],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
