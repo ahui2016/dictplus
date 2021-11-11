@@ -1,6 +1,10 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"ahui2016.github.com/dictplus/stmt"
+)
 
 type TX interface {
 	Exec(string, ...interface{}) (sql.Result, error)
@@ -24,4 +28,21 @@ func getInt1(tx TX, query string, arg ...interface{}) (n int64, err error) {
 
 type Row interface {
 	Scan(...interface{}) error
+}
+
+func insertWord(tx TX, w *Word) error {
+	_, err := tx.Exec(
+		stmt.InsertWord,
+		w.ID,
+		w.CN,
+		w.EN,
+		w.JP,
+		w.Kana,
+		w.Label,
+		w.Notes,
+		w.Links,
+		w.Images,
+		w.CTime,
+	)
+	return err
 }

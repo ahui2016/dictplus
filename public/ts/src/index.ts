@@ -14,6 +14,9 @@ const nowArea = m('div').append('Time is now: ', m(Now));
 
 $('#root').append(
   nowArea,
+  m('ul').append(
+    m('li').append(util.LinkElem('/public/edit-word.html', {text:'Add a new item'})),
+  ),
 );
 
 init();

@@ -5,21 +5,17 @@ export interface Text {
   message: string;
 }
 
-export interface Blog {
-  ID          :string;
-	Name        :string;
-	Author      :string;
-	Website     :string; // 博客或网站的网址
-	Links       :string; // 与博客或作者有关的其他网址，用换行符分隔
-	Description :string;
-	Feed        :string; // 用来判断网站有无更新的网址 (比如 RSS feed)
-	FeedDate    :number; // 上次检查时间 (时间戳)
-	FeedSize    :number; // 上次的 Feed 的内容的体积
-	LastUpdate  :number; // 上次更新时间 (时间戳)
-	Threshold   :number; // 当本次体积与 FeedSize 之差 (绝对值) 大于该阈值时判断为有更新
-	Status      :string;
-	ErrMsg      :string; // 上次失败原因 (成功时设定为空字符串)
-	Category    :string; // 类别
+export interface Word {
+  ID     :string; // ShortID
+	CN     :string;
+	EN     :string;
+	JP     :string;
+	Kana   :string; // 与 JP 对应的平假名
+	Label  :string; // 每个单词只有一个标签，通常用来记录出处（书名或文章名）
+	Notes  :string;
+	Links  :string[] | null; // json array
+	Images :string[] | null; // 图片 ID 数组，与 localtags 搭配使用
+	CTime  :number;
 }
 
 // 获取地址栏的参数。
@@ -111,10 +107,11 @@ export function CreateAlerts(max?: number): mjAlerts {
 export interface AjaxOptions {
   method: string;
   url: string;
-  body?: FormData | object;
+  body?: FormData | object | string;
   alerts?: mjAlerts;
   buttonID?: string;
   responseType?: XMLHttpRequestResponseType;
+  contentType?: string;
 }
 
 export function ajax(
@@ -181,13 +178,23 @@ export function ajax(
     onAlways?.(this);
   };
 
+  if (options.contentType) {
+    if (options.contentType == 'json') options.contentType = 'application/json';
+    xhr.setRequestHeader('Content-Type', options.contentType);
+    console.log(options.contentType);
+    
+  }
+
   if (options.body && !(options.body instanceof FormData)) {
     const body = new FormData();
     for (const [k, v] of Object.entries(options.body)) {
       body.set(k, v);
     }
+    console.log("body as FormData");
     xhr.send(body);
   } else {
+    console.log("body as it is");
+    console.log(options.body);
     xhr.send(options.body);
   }
 }
@@ -207,9 +214,18 @@ export function ajaxPromise(options: AjaxOptions, n: number): Promise<any> {
   });
 }
 
-export function val(obj: mjElement | mjComponent): string {
-  if ('elem' in obj) return obj.elem().val() as string
-  return obj.val() as string
+export function val(obj: mjElement | mjComponent, trim?:'trim'): string {
+  let s = '';
+  if ('elem' in obj) {
+    s = obj.elem().val() as string;
+  } else {
+    s = obj.val() as string
+  }
+  if (trim) {
+    return s.trim();
+  } else {
+    return s;
+  }
 }
 
 export function itemID(id: string): string {

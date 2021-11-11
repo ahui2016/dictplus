@@ -40,3 +40,16 @@ func (db *DB) Open(dbPath string) (err error) {
 	}
 	return initFirstID(word_id_key, word_id_prefix, db.DB)
 }
+
+func (db *DB) InsertWord(w *Word) (err error) {
+	tx := db.mustBegin()
+	defer tx.Rollback()
+
+	if w.ID, err = getNextID(tx, word_id_key); err != nil {
+		return
+	}
+	if err = insertWord(tx, w); err != nil {
+		return
+	}
+	return tx.Commit()
+}

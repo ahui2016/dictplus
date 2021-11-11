@@ -6,8 +6,8 @@ const ImageLocalIP = ""
 // Word 可以是一个单词或一个短句
 type Word struct {
 	ID     string // ShortID
-	EN     string
 	CN     string
+	EN     string
 	JP     string
 	Kana   string // 与 JP 对应的平假名
 	Label  string // 每个单词只有一个标签，一般用来记录出处（书名或文章名）
