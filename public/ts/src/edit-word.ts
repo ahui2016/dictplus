@@ -49,8 +49,8 @@ const Form = cc('form', {attr:{'autocomplete':'off'}, children:[
     }),
     m(AddBtn).on('click', e => {
       e.preventDefault();
-      const word = getItemJson();
-      util.ajax({method:'POST',url:'/api/add-word',alerts:SubmitAlerts,buttonID:AddBtn.id,contentType:'json',body:JSON.stringify(word)},
+      const body = getItemJson();
+      util.ajax({method:'POST',url:'/api/add-word',alerts:SubmitAlerts,buttonID:AddBtn.id,contentType:'json',body:body},
         resp => {
           wordID = (resp as util.Text).message;
           Alerts.insert('success', `添加项目成功 (id:${wordID})`);

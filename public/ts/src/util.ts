@@ -107,13 +107,17 @@ export function CreateAlerts(max?: number): mjAlerts {
 export interface AjaxOptions {
   method: string;
   url: string;
-  body?: FormData | object | string;
+  body?: FormData | object;
   alerts?: mjAlerts;
   buttonID?: string;
   responseType?: XMLHttpRequestResponseType;
   contentType?: string;
 }
 
+/**
+ * 注意：当 options.contentType 设为 json 时，options.body 应该是一个未转换为 JSON 的 object,
+ * 因为在 ajax 里会对 options.body 使用 JSON.stringfy
+ */
 export function ajax(
   options: AjaxOptions,
   onSuccess?: (resp: any) => void,
@@ -181,20 +185,17 @@ export function ajax(
   if (options.contentType) {
     if (options.contentType == 'json') options.contentType = 'application/json';
     xhr.setRequestHeader('Content-Type', options.contentType);
-    console.log(options.contentType);
-    
   }
 
-  if (options.body && !(options.body instanceof FormData)) {
+  if (options.contentType == 'application/json') {
+    xhr.send(JSON.stringify(options.body));
+  } else if (options.body && !(options.body instanceof FormData)) {
     const body = new FormData();
     for (const [k, v] of Object.entries(options.body)) {
       body.set(k, v);
     }
-    console.log("body as FormData");
     xhr.send(body);
   } else {
-    console.log("body as it is");
-    console.log(options.body);
     xhr.send(options.body);
   }
 }
