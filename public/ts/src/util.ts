@@ -13,9 +13,15 @@ export interface Word {
 	Kana   :string; // 与 JP 对应的平假名
 	Label  :string; // 每个单词只有一个标签，通常用来记录出处（书名或文章名）
 	Notes  :string;
-	Links  :string[] | null; // json array
-	Images :string[] | null; // 图片 ID 数组，与 localtags 搭配使用
+	Links  :string; // 用换行符分隔的网址
+	Images :string; // 用逗号分隔的图片 ID, 与 localtags 搭配使用
 	CTime  :number;
+}
+
+export const LocaltagsAddr = 'http://127.0.0.1:53549';
+
+export function imageUrl(id:string): string {
+  return `${LocaltagsAddr}/mainbucket/${id}`;
 }
 
 // 获取地址栏的参数。

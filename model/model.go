@@ -12,7 +12,7 @@ type Word struct {
 	Kana   string // 与 JP 对应的平假名
 	Label  string // 每个单词只有一个标签，一般用来记录出处（书名或文章名）
 	Notes  string
-	Links  []byte // json array
-	Images []byte // 图片 ID 数组，与 localtags 搭配使用
+	Links  string // 用换行符分隔的网址
+	Images string // 用逗号分隔的图片 ID, 与 localtags 搭配使用
 	CTime  int64
 }

@@ -13,7 +13,9 @@ func main() {
 	e.File("/", "public/index.html")
 
 	api := e.Group("/api", sleep)
+	api.POST("/get-word", getWordHandler)
 	api.POST("/add-word", addWordHandler)
+	api.POST("/update-word", updateWordHandler)
 
 	e.Logger.Fatal(e.Start(*addr))
 }

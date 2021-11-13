@@ -49,7 +49,7 @@ const Form = cc('form', {attr:{'autocomplete':'off'}, children:[
     }),
     m(AddBtn).on('click', e => {
       e.preventDefault();
-      const body = getItemJson();
+      const body = getFormWord();
       util.ajax({method:'POST',url:'/api/add-word',alerts:SubmitAlerts,buttonID:AddBtn.id,contentType:'json',body:body},
         resp => {
           wordID = (resp as util.Text).message;
@@ -58,7 +58,14 @@ const Form = cc('form', {attr:{'autocomplete':'off'}, children:[
           InfoBtn.elem().show().attr({href:'/public/word-info.html?id='+wordID});
         });
     }),
-    m(UpdateBtn).hide(),
+    m(UpdateBtn).on('click', e => {
+      e.preventDefault();
+      const body = getFormWord();
+      util.ajax({method:'POST',url:'/api/update-word',alerts:SubmitAlerts,buttonID:UpdateBtn.id,contentType:'json',body:body},
+        () => {
+          SubmitAlerts.insert('success', '更新成功');
+        });
+    }).hide(),
   ),
 ]});
 
@@ -82,14 +89,34 @@ function init() {
 
   $('title').text('Edit item - dictplus');
   Title.elem().text(`Edit item (id:${wordID})`);
+
+  util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
+    resp => {
+      const word = resp as util.Word;
+      Form.elem().show();
+      InfoBtn.elem().show();
+      UpdateBtn.elem().show();
+      AddBtn.elem().hide();
+
+      CN_Input.elem().val(word.CN);
+      EN_Input.elem().val(word.EN);
+      JP_Input.elem().val(word.JP);
+      Kana_Input.elem().val(word.Kana);
+      Label_Input.elem().val(word.Label);
+      Notes_Input.elem().val(word.Notes);
+      Links_Input.elem().val(word.Links);
+      Images_Input.elem().val(word.Images);
+    }, undefined, () => {
+      Loading.hide();
+    });
 }
 
-function getItemJson(): util.Word {
-  const link = util.val(Links_Input, 'trim')
-    .split('\n').map(w => w.trim()).filter(w => !!w);
+function getFormWord(): util.Word {
+  const links = util.val(Links_Input, 'trim')
+    .split(/\s/).map(w => w.trim()).filter(w => !!w).join('\n');
 
   const images = util.val(Images_Input, 'trim')
-    .split(/[,、， ]/).filter(w => !!w);
+    .split(/[,、，\s]/).filter(w => !!w).join(', ');
 
   return {
     ID: wordID,
@@ -99,8 +126,8 @@ function getItemJson(): util.Word {
     Kana: util.val(Kana_Input, 'trim'),
     Label: util.val(Label_Input, 'trim'),
     Notes: util.val(Notes_Input, 'trim'),
-    Links: link.length ? link : null,
-    Images: images.length ? images : null,
+    Links: links,
+    Images: images,
     CTime: 0
   }
 }

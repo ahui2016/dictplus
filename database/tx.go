@@ -46,3 +46,35 @@ func insertWord(tx TX, w *Word) error {
 	)
 	return err
 }
+
+func scanWord(row Row) (w Word, err error) {
+	err = row.Scan(
+		&w.ID,
+		&w.CN,
+		&w.EN,
+		&w.JP,
+		&w.Kana,
+		&w.Label,
+		&w.Notes,
+		&w.Links,
+		&w.Images,
+		&w.CTime,
+	)
+	return
+}
+
+func updateWord(tx TX, w *Word) error {
+	_, err := tx.Exec(
+		stmt.UpdateWord,
+		w.CN,
+		w.EN,
+		w.JP,
+		w.Kana,
+		w.Label,
+		w.Notes,
+		w.Links,
+		w.Images,
+		w.ID,
+	)
+	return err
+}

@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS word
 	kana     text    NOT NULL,
 	label    text    NOT NULL,
 	notes    text    NOT NULL,
-	links    blob    DEFAULT NULL,
-	images   blob    DEFAULT NULL,
+	links    text    NOT NULL,
+	images   text    NOT NULL,
 	ctime    int     NOT NULL
 );
 
@@ -39,6 +39,12 @@ const InsertTextValue = `INSERT INTO metadata (name, text_value) VALUES (?, ?);`
 const GetTextValue = `SELECT text_value FROM metadata WHERE name=?;`
 const UpdateTextValue = `UPDATE metadata SET text_value=? WHERE name=?;`
 
+const GetWordByID = `SELECT * FROM word WHERE id=?;`
+
 const InsertWord = `INSERT INTO word (
 	id, cn, en, jp, kana, label, notes, links, images, ctime
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+
+const UpdateWord = `UPDATE word SET
+	cn=?, en=?, jp=?, kana=?, label=?, notes=?, links=?, images=?
+	WHERE id=?;`

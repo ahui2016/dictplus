@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 
 	"ahui2016.github.com/dictplus/model"
 	"ahui2016.github.com/dictplus/stmt"
@@ -41,15 +42,29 @@ func (db *DB) Open(dbPath string) (err error) {
 	return initFirstID(word_id_key, word_id_prefix, db.DB)
 }
 
-func (db *DB) InsertWord(w *Word) (err error) {
+func (db *DB) GetWordByID(id string) (w Word, err error) {
+	row := db.DB.QueryRow(stmt.GetWordByID, id)
+	w, err = scanWord(row)
+	if err == sql.ErrNoRows {
+		err = fmt.Errorf("not found (id:%s)", id)
+	}
+	return
+}
+
+func (db *DB) InsertNewWord(w *Word) (err error) {
 	tx := db.mustBegin()
 	defer tx.Rollback()
 
 	if w.ID, err = getNextID(tx, word_id_key); err != nil {
 		return
 	}
+	w.CTime = util.TimeNow()
 	if err = insertWord(tx, w); err != nil {
 		return
 	}
 	return tx.Commit()
+}
+
+func (db *DB) UpdateWord(w *Word) error {
+	return updateWord(db.DB, w)
 }

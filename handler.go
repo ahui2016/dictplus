@@ -29,15 +29,49 @@ func errorHandler(err error, c echo.Context) {
 	util.Panic(c.JSON(500, Text{err.Error()}))
 }
 
-func addWordHandler(c echo.Context) error {
-	word, err := getWordValue(c)
+func getWordHandler(c echo.Context) error {
+	id := c.FormValue("id")
+	w, err := db.GetWordByID(id)
 	if err != nil {
 		return err
 	}
-	if err := db.InsertWord(word); err != nil {
+	return c.JSON(OK, w)
+}
+
+func addWordHandler(c echo.Context) error {
+	w, err := getWordValue(c)
+	if err != nil {
 		return err
 	}
-	return c.JSON(OK, Text{word.ID})
+	if err := db.InsertNewWord(w); err != nil {
+		return err
+	}
+	return c.JSON(OK, Text{w.ID})
+}
+
+func updateWordHandler(c echo.Context) error {
+	w, err := getWordValue(c)
+	if err != nil {
+		return err
+	}
+	if w.ID == "" {
+		return fmt.Errorf("id is empty, need an id")
+	}
+	// 确保 w.ID 存在于数据库中
+	if _, err = db.GetWordByID(w.ID); err != nil {
+		return err
+	}
+	return db.UpdateWord(w)
+}
+
+// getFormValue gets the c.FormValue(key), trims its spaces,
+// and checks if it is empty or not.
+func getFormValue(c echo.Context, key string) (string, error) {
+	value := strings.TrimSpace(c.FormValue(key))
+	if value == "" {
+		return "", fmt.Errorf("form value [%s] is empty", key)
+	}
+	return value, nil
 }
 
 func getWordValue(c echo.Context) (word *Word, err error) {
@@ -46,6 +80,7 @@ func getWordValue(c echo.Context) (word *Word, err error) {
 		return
 	}
 	word = new(Word)
+	word.ID = strings.TrimSpace(w.ID)
 	word.CN = strings.TrimSpace(w.CN)
 	word.EN = strings.TrimSpace(w.EN)
 	word.JP = strings.TrimSpace(w.JP)
@@ -55,6 +90,7 @@ func getWordValue(c echo.Context) (word *Word, err error) {
 	word.Kana = strings.TrimSpace(w.Kana)
 	word.Label = strings.TrimSpace(w.Label)
 	word.Notes = strings.TrimSpace(w.Notes)
-	word.Links = w.Links
+	word.Links = strings.TrimSpace(w.Links)
+	word.Images = strings.TrimSpace(w.Images)
 	return
 }
