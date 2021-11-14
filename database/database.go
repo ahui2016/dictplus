@@ -76,3 +76,26 @@ func (db *DB) InsertNewWord(w *Word) (err error) {
 func (db *DB) UpdateWord(w *Word) error {
 	return updateWord(db.DB, w)
 }
+
+func (db *DB) GetWords(label, pattern string) (words []*Word, err error) {
+	if label+pattern == "" {
+		return nil, fmt.Errorf("nothing to search")
+	}
+
+	var rows *sql.Rows
+
+	if label == "Recently-Added" {
+		rows, err = db.DB.Query(stmt.NewWords, 30)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		w, err := scanWord(rows)
+		if err != nil {
+			return nil, err
+		}
+		words = append(words, &w)
+	}
+	err = rows.Err()
+	return
+}

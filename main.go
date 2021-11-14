@@ -18,6 +18,7 @@ func main() {
 	api.POST("/update-word", updateWordHandler)
 	api.POST("/delete-word", deleteWordHandler)
 	api.GET("/count-words", countHandler)
+	api.GET("/get-new-words", getNewWords)
 
 	e.Logger.Fatal(e.Start(*addr))
 }

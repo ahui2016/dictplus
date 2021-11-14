@@ -84,6 +84,14 @@ func countHandler(c echo.Context) error {
 	return c.JSON(OK, Number{n})
 }
 
+func getNewWords(c echo.Context) error {
+	words, err := db.GetWords("Recently-Added", "")
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, words)
+}
+
 // getFormValue gets the c.FormValue(key), trims its spaces,
 // and checks if it is empty or not.
 func getFormValue(c echo.Context, key string) (string, error) {
@@ -104,11 +112,14 @@ func getWordValue(c echo.Context) (word *Word, err error) {
 	word.CN = strings.TrimSpace(w.CN)
 	word.EN = strings.TrimSpace(w.EN)
 	word.JP = strings.TrimSpace(w.JP)
+	word.Kana = strings.TrimSpace(w.Kana)
 	word.Other = strings.TrimSpace(w.Other)
 	if word.EN+word.CN+word.JP+word.Other == "" {
 		return nil, fmt.Errorf("必须至少填写一个: CN, EN, JP, Other")
 	}
-	word.Kana = strings.TrimSpace(w.Kana)
+	if word.Kana != "" && word.JP == "" {
+		return nil, fmt.Errorf("如果填写了 Kana, 就必须填写 JP")
+	}
 	word.Label = strings.TrimSpace(w.Label)
 	word.Notes = strings.TrimSpace(w.Notes)
 	word.Links = strings.TrimSpace(w.Links)

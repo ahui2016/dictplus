@@ -53,3 +53,5 @@ const InsertWord = `INSERT INTO word (
 const UpdateWord = `UPDATE word SET
 	cn=?, en=?, jp=?, kana=?, other=?, label=?, notes=?, links=?, images=?
 	WHERE id=?;`
+
+const NewWords = `SELECT * FROM word ORDER BY ctime DESC LIMIT ?;`

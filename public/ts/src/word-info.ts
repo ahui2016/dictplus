@@ -50,7 +50,7 @@ function init() {
       const Links = cc('div', {classes:'WordLinks'});
       const Images = cc('div', {classes:'WordImages'});
       const Notes = cc('pre', {classes:'WordNotes'});
-      const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD hh:mm:ss');
+      const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD HH:mm:ss');
 
       WordInfo.elem().show();
       WordInfo

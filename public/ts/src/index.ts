@@ -2,6 +2,7 @@
 import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
+const NotesLimit = 64;
 let isAllChecked = false;
 
 const Loading = util.CreateLoading('center');
@@ -53,6 +54,7 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
   ),
 ]});
 
+const WordList = cc('div');
 
 $('#root').append(
   titleArea,
@@ -60,16 +62,71 @@ $('#root').append(
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
   m(SearchForm).addClass('my-5').hide(),
+  m(WordList).addClass('my-5'),
 );
 
 init();
 
-
 function init() {
   count_words();
+  getNewWords();
 
   const v = $('input[type=checkbox]:checked').val();
   console.log(v);  
+}
+
+function getNewWords() {
+  util.ajax({method:'GET',url:'/api/get-new-words',alerts:Alerts},
+    resp => {
+      const words = resp as util.Word[]
+      if (words && words.length > 0) {
+        appendToList(WordList, words.map(WordItem));
+      }
+    });
+}
+
+function WordItem(w: util.Word): mjComponent {
+  const self = cc('div', {id:w.ID, classes:'WordItem', children:[
+    m('div').addClass('WordIDArea').append(
+      span(`[id:${w.ID}]`),
+      util.LinkElem('/public/edit-word.html?id='+w.ID,{text:'edit',blank:true}).addClass('ml-2'),
+      util.LinkElem('/public/word-info.html?id='+w.ID,{text:'view',blank:true}).addClass('ml-2'),
+    ),
+    m('div').addClass('WordLangs'),
+    m('div').addClass('WordNotes').hide(),
+  ]});
+  self.init = () => {
+    if (w.Links) {
+      self.elem().find('.WordIDArea').append(badge('links').addClass('ml-2'));
+    }
+    if (w.Images) {
+      self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
+    }
+    if (w.Label) {
+      self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2'));
+    }
+    ['CN','EN','JP','Other'].forEach(lang => {
+      const word = w as any;
+      if (word[lang]) {
+        self.elem().find('.WordLangs').append(
+          span(lang+': ').addClass('text-grey'),
+          word[lang], ' ',
+        );
+      }
+    });
+    if (w.Notes) {
+      self.elem().find('.WordNotes').show()
+        .append(limited_notes(w.Notes)).addClass('text-grey');
+    }
+  }
+  return self;
+}
+
+function limited_notes(notes: string): string {
+  if (notes.length <= NotesLimit) {
+    return notes;
+  }
+  return notes.substr(0, NotesLimit) + '...';
 }
 
 function count_words(): void {
@@ -98,4 +155,8 @@ function create_check(box:mjComponent, name:string): mjElement {
 function create_box(checked: 'checked'|'' = ''): mjComponent {
   const c = checked ? true : false;
   return cc('input', {attr:{type:'checkbox'},prop:{checked:c}});
+}
+
+function badge(name:string): mjElement {
+  return span(name).addClass('badge-grey');
 }
