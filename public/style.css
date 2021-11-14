@@ -44,6 +44,9 @@ a:hover {
 .ml-2 {
   margin-left: 0.5rem;
 }
+.ml-3 {
+  margin-left: 1rem;
+}
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -77,6 +80,7 @@ a:hover {
 }
 .btn-fat {
   padding: .375rem .75rem;
+  border-radius: .25rem;
 }
 .form-textinput {
   border: 1px solid;
@@ -175,14 +179,14 @@ a:hover {
     border-color: var(--default-color);
   }
   .btn:hover {
-    background-color: #3f3f46;;
+    background-color: var(--background-color);
     color: #e4e4e7;
   }
 
   .form-textinput {
     color: var(--primary-color);
     border-color: var(--default-color);
-    background-color: #3f3f46;
+    background-color: var(--background-color);
   }
 
   .Hint {

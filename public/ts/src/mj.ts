@@ -27,6 +27,7 @@ interface ComponentOptions {
   classes?:  string;
   css?:      {[index: string]:any};
   attr?:     {[index: string]:any};
+  prop?:     {[index: string]:any};
 }
 
 function newComponent(name: string, id: string): mjComponent {
@@ -54,6 +55,7 @@ export function cc(name: string, options?: ComponentOptions): mjComponent {
   const component = newComponent(name, id);
 
   if (options.attr)     component.view.attr(options.attr);
+  if (options.prop)     component.view.prop(options.prop);
   if (options.css)      component.view.css(options.css);
   if (options.classes)  component.view.addClass(options.classes);
   if (options.text) {

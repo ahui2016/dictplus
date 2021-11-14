@@ -12,14 +12,23 @@
 
   <style>
     .Plus {
-      color: red;
       font-size: larger;
     }
     .form-check-inline {
       display: inline;
     }
     .form-check-inline + .form-check-inline {
-      margin-left: 1em;
+      margin-left: 1rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      .Plus {
+        color: #ff6b6b;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      .Plus {
+        color: #e03131;
+      }
     }
   </style>
 </head>

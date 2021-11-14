@@ -255,9 +255,3 @@ export function LinkElem(href: string,options?:LinkOptions): mjElement {
   if (options.blank) link.attr('target', '_blank');
   return link;
 }
-
-function newFormData(name: string, value: string) {
-  const fd = new FormData();
-  fd.set(name, value);
-  return fd;
-}
