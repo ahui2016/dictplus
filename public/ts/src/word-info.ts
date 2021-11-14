@@ -45,10 +45,13 @@ function init() {
   util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
     resp => {
       const w = resp as util.Word;
+      $('title').text(`Edit (id:${wordID}) - dictplus`);
+
       const Links = cc('div', {classes:'WordLinks'});
       const Images = cc('div', {classes:'WordImages'});
       const Notes = cc('pre', {classes:'WordNotes'});
       const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD hh:mm:ss');
+
       WordInfo.elem().show();
       WordInfo
         .append('ID', w.ID)
@@ -56,11 +59,12 @@ function init() {
         .append('EN', w.EN)
         .append('JP', w.JP)
         .append('Kana', w.Kana)
+        .append('Other', w.Other)
         .append('Label', w.Label)
         .append('Links', m(Links))
         .append('Images', m(Images))
         .append('Notes', m(Notes).text(w.Notes))
-        .append('Created at', ctime);
+        .append('CTime', ctime);
 
       if (w.Links) {
         w.Links.split('\n').forEach(link => {
