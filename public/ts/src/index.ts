@@ -4,16 +4,13 @@ import * as util from './util.js';
 
 const titleArea = m('div').addClass('text-center').append(
   m('h1').append(
-    util.LinkElem('/', {text:'dictplus'}),
+    'dict', span('+').addClass('Plus'),
   ),
-  m('div').text('一个词典程序，但不只是一个词典程序'),
+  m('div').text('dictplus, 一个词典程序，但不只是一个词典程序'),
 );
 
-const Now = cc('span');
-const nowArea = m('div').append('Time is now: ', m(Now));
-
 $('#root').append(
-  nowArea,
+  titleArea,
   m('ul').append(
     m('li').append(util.LinkElem('/public/edit-word.html', {text:'Add a new item'})),
   ),
@@ -22,5 +19,4 @@ $('#root').append(
 init();
 
 function init() {
-  Now.elem().text(dayjs(Date.now()).format());
 }

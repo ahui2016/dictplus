@@ -13,7 +13,7 @@ const InfoBtn = cc('a', {text:'Info',classes:'ml-2',attr:{
   href: '/public/word-info.html?id='+wordID
 }});
 const naviBar = m('div').addClass('text-right').append(
-  util.LinkElem('/', {text:'Index'}),
+  util.LinkElem('/', {text:'Home'}),
   m(InfoBtn).hide(),
 );
 
@@ -21,6 +21,7 @@ const CN_Input = create_input();
 const EN_Input = create_input();
 const JP_Input = create_input();
 const Kana_Input = create_input();
+const Other_Input = create_input();
 const Label_Input = create_input();
 const Notes_Input = create_textarea();
 const Links_Input = create_textarea();
@@ -36,6 +37,7 @@ const Form = cc('form', {attr:{'autocomplete':'off'}, children:[
   create_item(EN_Input, 'EN', ''),
   create_item(JP_Input, 'JP', ''),
   create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
+  create_item(Other_Input, 'Other', '其他任何语种'),
   create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）'),
   create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等'),
   create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
@@ -81,9 +83,10 @@ init();
 
 function init() {
   if (!wordID) {
+    $('title').text('Add item - dictplus')
     Loading.hide();
     Form.elem().show();
-    $('title').text('Add item - dictplus')
+    CN_Input.elem().trigger('focus');
     return;
   }
 
@@ -102,10 +105,13 @@ function init() {
       EN_Input.elem().val(word.EN);
       JP_Input.elem().val(word.JP);
       Kana_Input.elem().val(word.Kana);
+      Other_Input.elem().val(word.Other);
       Label_Input.elem().val(word.Label);
       Notes_Input.elem().val(word.Notes);
       Links_Input.elem().val(word.Links);
       Images_Input.elem().val(word.Images);
+
+      CN_Input.elem().trigger('focus');
     }, undefined, () => {
       Loading.hide();
     });
@@ -124,6 +130,7 @@ function getFormWord(): util.Word {
     EN: util.val(EN_Input, 'trim'),
     JP: util.val(JP_Input, 'trim'),
     Kana: util.val(Kana_Input, 'trim'),
+    Other: util.val(Other_Input, 'trim'),
     Label: util.val(Label_Input, 'trim'),
     Notes: util.val(Notes_Input, 'trim'),
     Links: links,

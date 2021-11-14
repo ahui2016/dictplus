@@ -92,8 +92,9 @@ func getWordValue(c echo.Context) (word *Word, err error) {
 	word.CN = strings.TrimSpace(w.CN)
 	word.EN = strings.TrimSpace(w.EN)
 	word.JP = strings.TrimSpace(w.JP)
-	if word.EN+word.CN+word.JP == "" {
-		return nil, fmt.Errorf("CN, EN, JP 必须至少填写一个")
+	word.Other = strings.TrimSpace(w.Other)
+	if word.EN+word.CN+word.JP+word.Other == "" {
+		return nil, fmt.Errorf("必须至少填写一个: CN, EN, JP, Other")
 	}
 	word.Kana = strings.TrimSpace(w.Kana)
 	word.Label = strings.TrimSpace(w.Label)

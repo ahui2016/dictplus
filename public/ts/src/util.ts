@@ -11,6 +11,7 @@ export interface Word {
 	EN     :string;
 	JP     :string;
 	Kana   :string; // 与 JP 对应的平假名
+  Other  :string; // 其他任何语种
 	Label  :string; // 每个单词只有一个标签，通常用来记录出处（书名或文章名）
 	Notes  :string;
 	Links  :string; // 用换行符分隔的网址

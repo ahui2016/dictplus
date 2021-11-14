@@ -12,7 +12,7 @@ const titleArea = m('div').addClass('text-center').append(
 );
 
 const naviBar = m('div').addClass('text-right').append(
-  util.LinkElem('/',{text:'Index'}),
+  util.LinkElem('/',{text:'Home'}),
   util.LinkElem('/public/edit-word.html?id='+wordID, {text:'Edit'}).addClass('ml-2'),
 );
 

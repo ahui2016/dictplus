@@ -4,31 +4,32 @@ const CreateTables = `
 
 CREATE TABLE IF NOT EXISTS word
 (
-	id       text    PRIMARY KEY COLLATE NOCASE,
-	cn       text    NOT NULL,
-	en       text    NOT NULL,
-	jp       text    NOT NULL,
-	kana     text    NOT NULL,
-	label    text    NOT NULL,
-	notes    text    NOT NULL,
-	links    text    NOT NULL,
-	images   text    NOT NULL,
-	ctime    int     NOT NULL
+	id       text   PRIMARY KEY COLLATE NOCASE,
+	cn       text   NOT NULL,
+	en       text   NOT NULL,
+	jp       text   NOT NULL,
+	kana     text   NOT NULL,
+	other    text   NOT NULL,
+	label    text   NOT NULL,
+	notes    text   NOT NULL,
+	links    text   NOT NULL,
+	images   text   NOT NULL,
+	ctime    int    NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_word_id ON word(id);
 CREATE INDEX IF NOT EXISTS idx_word_cn ON word(cn);
 CREATE INDEX IF NOT EXISTS idx_word_en ON word(en);
 CREATE INDEX IF NOT EXISTS idx_word_jp ON word(jp);
 CREATE INDEX IF NOT EXISTS idx_word_kana ON word(kana);
+CREATE INDEX IF NOT EXISTS idx_word_other ON word(other);
 CREATE INDEX IF NOT EXISTS idx_word_label ON word(label);
 CREATE INDEX IF NOT EXISTS idx_word_ctime ON word(ctime);
 
 CREATE TABLE IF NOT EXISTS metadata
 (
-  name         text    NOT NULL UNIQUE,
-  int_value    int     NOT NULL DEFAULT 0,
-  text_value   text    NOT NULL DEFAULT "" 
+  name         text   NOT NULL UNIQUE,
+  int_value    int    NOT NULL DEFAULT 0,
+  text_value   text   NOT NULL DEFAULT "" 
 );
 `
 const InsertIntValue = `INSERT INTO metadata (name, int_value) VALUES (?, ?);`
@@ -44,9 +45,9 @@ const DeleteWord = `DELETE FROM word WHERE id=?;`
 const GetWordByID = `SELECT * FROM word WHERE id=?;`
 
 const InsertWord = `INSERT INTO word (
-	id, cn, en, jp, kana, label, notes, links, images, ctime
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	id, cn, en, jp, kana, other, label, notes, links, images, ctime
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 
 const UpdateWord = `UPDATE word SET
-	cn=?, en=?, jp=?, kana=?, label=?, notes=?, links=?, images=?
+	cn=?, en=?, jp=?, kana=?, other=?, label=?, notes=?, links=?, images=?
 	WHERE id=?;`
