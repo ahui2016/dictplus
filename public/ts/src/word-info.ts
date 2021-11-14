@@ -88,3 +88,10 @@ function create_table_row(key:string,value:string|mjElement): mjElement {
   }
   return tr;
 }
+
+(window as any).delete_forever = () => {
+  util.ajax({method:'POST',url:'/api/delete-word',alerts:Alerts,body:{id:wordID}},
+    () => {
+      Alerts.clear().insert('danger', '已彻底删除该项目，不可恢复。');
+    });
+};

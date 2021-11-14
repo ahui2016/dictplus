@@ -39,6 +39,8 @@ const InsertTextValue = `INSERT INTO metadata (name, text_value) VALUES (?, ?);`
 const GetTextValue = `SELECT text_value FROM metadata WHERE name=?;`
 const UpdateTextValue = `UPDATE metadata SET text_value=? WHERE name=?;`
 
+const DeleteWord = `DELETE FROM word WHERE id=?;`
+
 const GetWordByID = `SELECT * FROM word WHERE id=?;`
 
 const InsertWord = `INSERT INTO word (

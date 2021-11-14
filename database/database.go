@@ -51,6 +51,10 @@ func (db *DB) GetWordByID(id string) (w Word, err error) {
 	return
 }
 
+func (db *DB) DeleteWord(id string) error {
+	return db.Exec(stmt.DeleteWord, id)
+}
+
 func (db *DB) InsertNewWord(w *Word) (err error) {
 	tx := db.mustBegin()
 	defer tx.Rollback()

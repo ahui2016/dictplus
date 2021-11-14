@@ -145,3 +145,11 @@ function create_item(comp: mjComponent, name: string, description: string): mjEl
     m('div').addClass('form-text').text(description),
   );
 }
+
+(window as any).delete_forever = () => {
+  util.ajax({method:'POST',url:'/api/delete-word',alerts:SubmitAlerts,body:{id:wordID}},
+    () => {
+      Alerts.clear().insert('success', '已彻底删除该项目，不可恢复。');
+      Form.elem().hide();
+    });
+};

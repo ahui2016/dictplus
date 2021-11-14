@@ -38,6 +38,14 @@ func getWordHandler(c echo.Context) error {
 	return c.JSON(OK, w)
 }
 
+func deleteWordHandler(c echo.Context) error {
+	id := c.FormValue("id")
+	if _, err := db.GetWordByID(id); err != nil {
+		return err
+	}
+	return db.DeleteWord(id)
+}
+
 func addWordHandler(c echo.Context) error {
 	w, err := getWordValue(c)
 	if err != nil {
