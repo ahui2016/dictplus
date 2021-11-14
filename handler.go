@@ -15,6 +15,10 @@ type Text struct {
 	Message string `json:"message"`
 }
 
+type Number struct {
+	N int64 `json:"n"`
+}
+
 func sleep(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		time.Sleep(time.Second)
@@ -70,6 +74,14 @@ func updateWordHandler(c echo.Context) error {
 		return err
 	}
 	return db.UpdateWord(w)
+}
+
+func countHandler(c echo.Context) error {
+	n, err := db.CountAllWords()
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, Number{n})
 }
 
 // getFormValue gets the c.FormValue(key), trims its spaces,

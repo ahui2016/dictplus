@@ -44,6 +44,8 @@ const DeleteWord = `DELETE FROM word WHERE id=?;`
 
 const GetWordByID = `SELECT * FROM word WHERE id=?;`
 
+const CountAllWords = `SELECT count(*) FROM word;`
+
 const InsertWord = `INSERT INTO word (
 	id, cn, en, jp, kana, other, label, notes, links, images, ctime
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`

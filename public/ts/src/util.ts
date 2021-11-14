@@ -4,6 +4,9 @@ import { mjElement, mjComponent, m, cc, span } from './mj.js';
 export interface Text {
   message: string;
 }
+export interface Num {
+  n: number;
+}
 
 export interface Word {
   ID     :string; // ShortID
