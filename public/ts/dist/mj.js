@@ -31,6 +31,8 @@ export function cc(name, options) {
     const component = newComponent(name, id);
     if (options.attr)
         component.view.attr(options.attr);
+    if (options.prop)
+        component.view.prop(options.prop);
     if (options.css)
         component.view.css(options.css);
     if (options.classes)

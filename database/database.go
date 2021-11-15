@@ -11,6 +11,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const PageLimit = 100 // 搜索结果每页上限
+
 type (
 	Word = model.Word
 )
@@ -77,15 +79,37 @@ func (db *DB) UpdateWord(w *Word) error {
 	return updateWord(db.DB, w)
 }
 
-func (db *DB) GetWords(label, pattern string) (words []*Word, err error) {
-	if label+pattern == "" {
+func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err error) {
+	if len(fields) == 0 {
+		return nil, fmt.Errorf("no field to search")
+	}
+	if pattern == "" {
 		return nil, fmt.Errorf("nothing to search")
 	}
 
 	var rows *sql.Rows
 
-	if label == "Recently-Added" {
+	query := "SELECT * FROM word where"
+
+	if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, 30)
+	} else {
+		for i, field := range fields {
+			if i == 0 {
+				query += fmt.Sprintf(" %s LIKE ?", field)
+			} else {
+				query += fmt.Sprintf(" OR %s LIKE ?", field)
+			}
+		}
+		query += " ORDER BY ctime DESC LIMIT ?;"
+		// 拼接后的 query 大概像这个样子 SELECT * FROM word WHERE CN LIKE ? OR EN LIKE ? OR JP LIKE ? ORDER BY ctime DESC LIMIT ?;
+		args := []interface{}{}
+		pattern = "%" + pattern + "%"
+		for range fields {
+			args = append(args, pattern)
+		}
+		args = append(args, PageLimit)
+		rows, err = db.DB.Query(query, args...)
 	}
 	defer rows.Close()
 

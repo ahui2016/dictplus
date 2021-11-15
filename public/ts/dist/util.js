@@ -1,5 +1,9 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
 import { m, cc } from './mj.js';
+export const LocaltagsAddr = 'http://127.0.0.1:53549';
+export function imageUrl(id) {
+    return `${LocaltagsAddr}/mainbucket/${id}`;
+}
 // 获取地址栏的参数。
 export function getUrlParam(param) {
     var _a;
@@ -68,6 +72,10 @@ export function CreateAlerts(max) {
     };
     return alerts;
 }
+/**
+ * 注意：当 options.contentType 设为 json 时，options.body 应该是一个未转换为 JSON 的 object,
+ * 因为在 ajax 里会对 options.body 使用 JSON.stringfy
+ */
 export function ajax(options, onSuccess, onFail, onAlways, onReady) {
     const handleErr = (that, errMsg) => {
         if (onFail) {
@@ -122,7 +130,15 @@ export function ajax(options, onSuccess, onFail, onAlways, onReady) {
             enable(options.buttonID);
         onAlways === null || onAlways === void 0 ? void 0 : onAlways(this);
     };
-    if (options.body && !(options.body instanceof FormData)) {
+    if (options.contentType) {
+        if (options.contentType == 'json')
+            options.contentType = 'application/json';
+        xhr.setRequestHeader('Content-Type', options.contentType);
+    }
+    if (options.contentType == 'application/json') {
+        xhr.send(JSON.stringify(options.body));
+    }
+    else if (options.body && !(options.body instanceof FormData)) {
         const body = new FormData();
         for (const [k, v] of Object.entries(options.body)) {
             body.set(k, v);
@@ -147,10 +163,20 @@ export function ajaxPromise(options, n) {
         );
     });
 }
-export function val(obj) {
-    if ('elem' in obj)
-        return obj.elem().val();
-    return obj.val();
+export function val(obj, trim) {
+    let s = '';
+    if ('elem' in obj) {
+        s = obj.elem().val();
+    }
+    else {
+        s = obj.val();
+    }
+    if (trim) {
+        return s.trim();
+    }
+    else {
+        return s;
+    }
 }
 export function itemID(id) {
     return `i${id}`;
@@ -167,9 +193,4 @@ export function LinkElem(href, options) {
     if (options.blank)
         link.attr('target', '_blank');
     return link;
-}
-function newFormData(name, value) {
-    const fd = new FormData();
-    fd.set(name, value);
-    return fd;
 }

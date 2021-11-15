@@ -19,6 +19,11 @@ const naviBar = m('div').addClass('text-right').append(
   util.LinkElem('/public/edit-word.html', {text:'Add', title:'Add a new item'}),
 );
 
+const ResultTitle = cc('h3', {text:'Recently Added (最近添加)'});
+const ResultAlerts = util.CreateAlerts(1);
+const HR = cc('hr');
+const WordList = cc('div');
+
 const CN_Box = create_box('checked');
 const EN_Box = create_box('checked');
 const JP_Box = create_box('checked');
@@ -50,11 +55,36 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
   m('div').addClass('text-center mt-2').append(
     m(SearchBtn).on('click', e => {
       e.preventDefault();
+      const pattern = util.val(SearchInput, 'trim');
+      SearchAlerts.insert('primary', 'searching: '+pattern);
+      const body = {pattern: pattern, fields: getFields()};
+      
+      util.ajax({method:'POST',url:'/api/search-words',alerts:SearchAlerts,buttonID:SearchBtn.id,contentType:'json',body:body},
+        resp => {
+          const words = resp as util.Word[];
+          if (!resp || words.length == 0) {
+            SearchAlerts.insert('danger', '找不到 (not found)');
+            return;
+          }
+          SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
+          ResultTitle.elem().text('Results (结果)')
+          ResultAlerts.insert('success', `Search [${pattern}] in ${body.fields.join(', ')}`);
+          clear_list(WordList);
+          appendToList(WordList, words.map(WordItem));
+        });
     })
   ),
 ]});
 
-const WordList = cc('div');
+function clear_list(list: mjComponent): void {
+  list.elem().html('');
+}
+
+const Footer = cc('div', {classes:'text-center',children:[
+  util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
+  m('br'),
+  span('version: 2021-11-15').addClass('text-grey'),
+]});
 
 $('#root').append(
   titleArea,
@@ -62,7 +92,11 @@ $('#root').append(
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
   m(SearchForm).addClass('my-5').hide(),
-  m(WordList).addClass('my-5'),
+  m(ResultTitle).hide(),
+  m(ResultAlerts),
+  m(HR).hide(),
+  m(WordList).addClass('mt-3'),
+  m(Footer).addClass('my-5'),
 );
 
 init();
@@ -70,16 +104,16 @@ init();
 function init() {
   count_words();
   getNewWords();
-
-  const v = $('input[type=checkbox]:checked').val();
-  console.log(v);  
 }
 
 function getNewWords() {
-  util.ajax({method:'GET',url:'/api/get-new-words',alerts:Alerts},
+  const body = {pattern: 'Recently-Added', fields: ['Recently-Added']};
+  util.ajax({method:'POST',url:'/api/search-words',alerts:Alerts,contentType:'json',body:body},
     resp => {
       const words = resp as util.Word[]
       if (words && words.length > 0) {
+        ResultTitle.elem().show();
+        HR.elem().show();
         appendToList(WordList, words.map(WordItem));
       }
     });
@@ -120,6 +154,21 @@ function WordItem(w: util.Word): mjComponent {
     }
   }
   return self;
+}
+
+function getFields(): Array<string> {
+  const boxes = $('input[type=checkbox]:checked');
+  if (boxes.length == 0) {
+    return ['CN','EN','JP','Kana','Other'];
+  }
+  const fields:Array<string> = [];
+  boxes.each((_,elem) => {
+    const v = $(elem).val();
+    if (typeof v == 'string') {
+      fields.push(v);
+    }
+  });
+  return fields;
 }
 
 function limited_notes(notes: string): string {

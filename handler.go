@@ -84,8 +84,16 @@ func countHandler(c echo.Context) error {
 	return c.JSON(OK, Number{n})
 }
 
-func getNewWords(c echo.Context) error {
-	words, err := db.GetWords("Recently-Added", "")
+func searchHandler(c echo.Context) error {
+	type form struct {
+		Pattern string   `json:"pattern"`
+		Fields  []string `json:"fields"`
+	}
+	f := new(form)
+	if err := c.Bind(f); err != nil {
+		return err
+	}
+	words, err := db.GetWords(strings.TrimSpace(f.Pattern), f.Fields)
 	if err != nil {
 		return err
 	}
