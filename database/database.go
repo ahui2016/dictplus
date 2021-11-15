@@ -11,7 +11,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const PageLimit = 100 // 搜索结果每页上限
+const (
+	NewWordsLimit = 30
+	PageLimit     = 100 // 搜索结果每页上限
+)
 
 type (
 	Word = model.Word
@@ -41,7 +44,9 @@ func (db *DB) Open(dbPath string) (err error) {
 	if err = db.Exec(stmt.CreateTables); err != nil {
 		return
 	}
-	return initFirstID(word_id_key, word_id_prefix, db.DB)
+	e1 := initFirstID(word_id_key, word_id_prefix, db.DB)
+	e2 := initHistory(db.DB)
+	return util.WrapErrors(e1, e2)
 }
 
 func (db *DB) GetWordByID(id string) (w Word, err error) {
@@ -92,7 +97,7 @@ func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err erro
 	query := "SELECT * FROM word where"
 
 	if fields[0] == "Recently-Added" {
-		rows, err = db.DB.Query(stmt.NewWords, 30)
+		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)
 	} else {
 		for i, field := range fields {
 			if i == 0 {

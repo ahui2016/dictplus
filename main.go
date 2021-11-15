@@ -19,6 +19,8 @@ func main() {
 	api.POST("/delete-word", deleteWordHandler)
 	api.POST("/search-words", searchHandler)
 	api.GET("/count-words", countHandler)
+	api.GET("/get-history", getHistoryHandler)
+	api.POST("/update-history", updateHistory)
 
 	e.Logger.Fatal(e.Start(*addr))
 }

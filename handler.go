@@ -100,6 +100,22 @@ func searchHandler(c echo.Context) error {
 	return c.JSON(OK, words)
 }
 
+func getHistoryHandler(c echo.Context) error {
+	history, err := db.GetHistory()
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, history)
+}
+
+func updateHistory(c echo.Context) error {
+	history, err := getFormValue(c, "history")
+	if err != nil {
+		return err
+	}
+	return db.UpdateHistory(history)
+}
+
 // getFormValue gets the c.FormValue(key), trims its spaces,
 // and checks if it is empty or not.
 func getFormValue(c echo.Context, key string) (string, error) {

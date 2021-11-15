@@ -3,6 +3,8 @@ import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
 const NotesLimit = 64;
+const HistoryLimit = 30;
+let History: Array<string> = [];
 let isAllChecked = false;
 
 const Loading = util.CreateLoading('center');
@@ -208,4 +210,20 @@ function create_box(checked: 'checked'|'' = ''): mjComponent {
 
 function badge(name:string): mjElement {
   return span(name).addClass('badge-grey');
+}
+
+function updateHistory(pattern: string): void {
+  const i = History.indexOf(pattern);
+  if (i >= 0) {
+    History.splice(i, 1);
+  }
+  History.unshift(pattern);
+  if (History.length > HistoryLimit) {
+    History.pop();
+  }
+  const body = {'history': History.join('\n')};
+  util.ajax({method:'POST',url:'/api/update-history',alerts:SearchAlerts,body:body},
+    () => {
+      
+    });
 }

@@ -10,12 +10,18 @@ import (
 const (
 	word_id_key    = "word-id-key"
 	word_id_prefix = "W"
+	history_id_key = "history-id-key" // 搜索历史，用换行符分隔
 )
 
 func getTextValue(key string, tx TX) (value string, err error) {
 	row := tx.QueryRow(stmt.GetTextValue, key)
 	err = row.Scan(&value)
 	return
+}
+
+func UpdateTextValue(key, v string, tx TX) error {
+	_, err := tx.Exec(stmt.UpdateTextValue, v, key)
+	return err
 }
 
 func getIntValue(key string, tx TX) (value int64, err error) {
@@ -50,6 +56,19 @@ func getNextID(tx TX, key string) (nextID string, err error) {
 		return
 	}
 	nextID = currentID.Next().String()
-	_, err = tx.Exec(stmt.UpdateTextValue, nextID, key)
+	err = UpdateTextValue(key, nextID, tx)
 	return
+}
+
+func initHistory(tx TX) error {
+	_, err := tx.Exec(stmt.InsertTextValue, history_id_key, "")
+	return err
+}
+
+func (db *DB) GetHistory() (string, error) {
+	return getTextValue(history_id_key, db.DB)
+}
+
+func (db *DB) UpdateHistory(v string) error {
+	return UpdateTextValue(history_id_key, v, db.DB)
 }
