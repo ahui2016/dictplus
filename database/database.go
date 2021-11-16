@@ -45,7 +45,7 @@ func (db *DB) Open(dbPath string) (err error) {
 		return
 	}
 	e1 := initFirstID(word_id_key, word_id_prefix, db.DB)
-	e2 := initHistory(db.DB)
+	e2 := db.initHistory()
 	return util.WrapErrors(e1, e2)
 }
 
@@ -98,6 +98,8 @@ func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err erro
 
 	if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)
+	} else if len(fields) == 1 && fields[0] == "Label" {
+		rows, err = db.DB.Query(stmt.GetByLabel, pattern+"%", PageLimit)
 	} else {
 		for i, field := range fields {
 			if i == 0 {

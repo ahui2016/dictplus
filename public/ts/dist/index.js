@@ -9,7 +9,7 @@ let SuccessOnce = false;
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const titleArea = m('div').addClass('text-center').append(m('h1').append('dict', span('+').addClass('Plus')), m('div').text('dictplus, 一个词典程序，但不只是一个词典程序'));
-const naviBar = m('div').addClass('text-right').append(util.LinkElem('/public/edit-word.html', { text: 'Add', title: 'Add a new item' }));
+const naviBar = m('div').addClass('text-right').append(util.LinkElem('/public/edit-word.html', { text: 'Add', title: 'Add a new item', blank: true }));
 const ResultTitle = cc('h3', { text: 'Recently Added (最近添加)' });
 const ResultAlerts = util.CreateAlerts(1);
 const HR = cc('hr');
@@ -44,7 +44,7 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
         create_check(Notes_Box, 'Notes'),
         m(CheckAllBtn).on('click', e => {
             e.preventDefault();
-            $('input[type=checkbox]').prop('checked', !isAllChecked);
+            $('input[name=field]').prop('checked', !isAllChecked);
             isAllChecked = !isAllChecked;
         }),
         m(SearchInput).addClass('form-textinput form-textinput-fat'),
@@ -67,7 +67,11 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
                 }
                 SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
                 ResultTitle.elem().text('Results (结果)');
-                ResultAlerts.insert('success', `Search [${pattern}] in ${body.fields.join(', ')}`);
+                let successMsg = `Search [${pattern}] in ${body.fields.join(', ')}`;
+                if (body.fields.length == 1 && body.fields[0] == 'Label') {
+                    successMsg = `Search by label begin with [${pattern}]`;
+                }
+                ResultAlerts.insert('success', successMsg);
                 clear_list(WordList);
                 appendToList(WordList, words.map(WordItem));
                 if (!SuccessOnce) {
@@ -117,7 +121,14 @@ function WordItem(w) {
             self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
         }
         if (w.Label) {
-            self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2'));
+            self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2 cursor-pointer')).on('click', e => {
+                e.preventDefault();
+                SearchInput.elem().val(w.Label);
+                isAllChecked = true;
+                CheckAllBtn.elem().trigger('click');
+                $('input[name=field][value=Label]').prop('checked', true);
+                SearchBtn.elem().trigger('click');
+            });
         }
         ['CN', 'EN', 'JP', 'Other'].forEach(lang => {
             const word = w;
@@ -133,7 +144,7 @@ function WordItem(w) {
     return self;
 }
 function getFields() {
-    const boxes = $('input[type=checkbox]:checked');
+    const boxes = $('input[name=field]:checked');
     if (boxes.length == 0) {
         return ['CN', 'EN', 'JP', 'Kana', 'Other'];
     }
@@ -172,7 +183,7 @@ function create_check(box, name) {
 }
 function create_box(checked = '') {
     const c = checked ? true : false;
-    return cc('input', { attr: { type: 'checkbox' }, prop: { checked: c } });
+    return cc('input', { attr: { type: 'checkbox', name: 'field' }, prop: { checked: c } });
 }
 function badge(name) {
     return span(name).addClass('badge-grey');

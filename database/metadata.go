@@ -60,8 +60,11 @@ func getNextID(tx TX, key string) (nextID string, err error) {
 	return
 }
 
-func initHistory(tx TX) error {
-	_, err := tx.Exec(stmt.InsertTextValue, history_id_key, "")
+func (db *DB) initHistory() error {
+	_, err := db.GetHistory()
+	if err == sql.ErrNoRows {
+		err = db.Exec(stmt.InsertTextValue, history_id_key, "")
+	}
 	return err
 }
 

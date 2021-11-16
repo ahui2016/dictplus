@@ -55,3 +55,6 @@ const UpdateWord = `UPDATE word SET
 	WHERE id=?;`
 
 const NewWords = `SELECT * FROM word ORDER BY ctime DESC LIMIT ?;`
+
+const GetByLabel = `
+	SELECT * FROM word WHERE label LIKE ? ORDER BY ctime DESC LIMIT ?;`
