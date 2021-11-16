@@ -6,6 +6,7 @@ const NotesLimit = 64;
 const HistoryLimit = 30;
 let History: Array<string> = [];
 let isAllChecked = false;
+let SuccessOnce = false;
 
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
@@ -26,6 +27,13 @@ const ResultAlerts = util.CreateAlerts(1);
 const HR = cc('hr');
 const WordList = cc('div');
 
+const HistoryItems = cc('div');
+const HistoryArea = cc('div', {children:[
+  m('h3').text('History (检索历史)'),
+  m('hr'),
+  m(HistoryItems),
+]});
+
 const CN_Box = create_box('checked');
 const EN_Box = create_box('checked');
 const JP_Box = create_box('checked');
@@ -36,7 +44,7 @@ const Notes_Box = create_box();
 const CheckAllBtn = cc('a', {
   text:'[all]', classes:'ml-3',
   attr:{title:'check all / uncheck all', href:'#'}});
-const SearchInput = cc('input', {attr:{type:'text'}});
+const SearchInput = cc('input', {attr:{type:'text'},prop:{autofocus:true}});
 const SearchAlerts = util.CreateAlerts(2);
 const SearchBtn = cc('button', {text:'Search',classes:'btn btn-fat text-right'})
 const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
@@ -58,9 +66,15 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
     m(SearchBtn).on('click', e => {
       e.preventDefault();
       const pattern = util.val(SearchInput, 'trim');
-      SearchAlerts.insert('primary', 'searching: '+pattern);
+      if (!pattern) {
+        SearchInput.elem().trigger('focus');
+        return;
+      }
+
+      SearchAlerts.insert('primary', 'searching: '+pattern);      
+      updateHistory(pattern);
       const body = {pattern: pattern, fields: getFields()};
-      
+
       util.ajax({method:'POST',url:'/api/search-words',alerts:SearchAlerts,buttonID:SearchBtn.id,contentType:'json',body:body},
         resp => {
           const words = resp as util.Word[];
@@ -73,6 +87,10 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
           ResultAlerts.insert('success', `Search [${pattern}] in ${body.fields.join(', ')}`);
           clear_list(WordList);
           appendToList(WordList, words.map(WordItem));
+          if (!SuccessOnce) {
+            SuccessOnce = true;
+            HistoryArea.elem().insertAfter(WordList.elem());
+          }
         });
     })
   ),
@@ -94,6 +112,7 @@ $('#root').append(
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
   m(SearchForm).addClass('my-5').hide(),
+  m(HistoryArea).addClass('my-5').hide(),
   m(ResultTitle).hide(),
   m(ResultAlerts),
   m(HR).hide(),
@@ -105,10 +124,11 @@ init();
 
 function init() {
   count_words();
-  getNewWords();
+  initNewWords();
+  initHistory();
 }
 
-function getNewWords() {
+function initNewWords() {
   const body = {pattern: 'Recently-Added', fields: ['Recently-Added']};
   util.ajax({method:'POST',url:'/api/search-words',alerts:Alerts,contentType:'json',body:body},
     resp => {
@@ -191,6 +211,7 @@ function count_words(): void {
       const count = n.toLocaleString('en-US');
       Alerts.insert('success', `数据库中已有 ${count} 条数据`);
       SearchForm.elem().show();
+      SearchInput.elem().trigger('focus');
     }, undefined, () => {
       Loading.hide();
     });
@@ -212,6 +233,35 @@ function badge(name:string): mjElement {
   return span(name).addClass('badge-grey');
 }
 
+function HistoryItem(h: string): mjComponent {
+  const self = cc('a', {text:h,attr:{href:'#'},classes:'HistoryItem'});
+  self.init = () => {
+    self.elem().on('click', e => {
+      e.preventDefault();
+      SearchInput.elem().val(h);
+      SearchBtn.elem().trigger('click');
+    });
+  };
+  return self;
+}
+
+function initHistory(): void {
+  util.ajax({method:'GET',url:'/api/get-history',alerts:Alerts},
+    resp => {
+      History = (resp as util.Text).message.split(/\r?\n/).filter(h => !!h);
+      if (History.length == 0) {
+        return;
+      }
+      HistoryArea.elem().show();
+      refreshHistory();
+    });
+}
+
+function refreshHistory(): void {
+  HistoryItems.elem().html('');
+  appendToList(HistoryItems, History.map(HistoryItem));
+}
+
 function updateHistory(pattern: string): void {
   const i = History.indexOf(pattern);
   if (i >= 0) {
@@ -221,9 +271,10 @@ function updateHistory(pattern: string): void {
   if (History.length > HistoryLimit) {
     History.pop();
   }
-  const body = {'history': History.join('\n')};
+  const body = {'history': History.join('\n')};  
+  
   util.ajax({method:'POST',url:'/api/update-history',alerts:SearchAlerts,body:body},
     () => {
-      
+      refreshHistory();
     });
 }
