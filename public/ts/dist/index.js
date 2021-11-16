@@ -121,14 +121,14 @@ function WordItem(w) {
             self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
         }
         if (w.Label) {
-            self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2 cursor-pointer')).on('click', e => {
+            self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2 cursor-pointer').on('click', e => {
                 e.preventDefault();
                 SearchInput.elem().val(w.Label);
                 isAllChecked = true;
                 CheckAllBtn.elem().trigger('click');
                 $('input[name=field][value=Label]').prop('checked', true);
                 SearchBtn.elem().trigger('click');
-            });
+            }));
         }
         ['CN', 'EN', 'JP', 'Other'].forEach(lang => {
             const word = w;
