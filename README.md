@@ -33,3 +33,10 @@
 - 搜索不区分大小写。
 - 默认搜索方式是 "包含", 但当单独搜索 Label 时则采用 "begin with" 方式。
 - 搜索结果最多只显示 100 条（有计划增加一个解除条数限制的高级功能）
+
+
+## 本站前端使用 mj.js
+
+- mj.js 是一个受 Mithril.js 启发的基于 jQuery 实现的极简框架，对于曾经用过 jQuery 的人来说，学习成本接近零。详见 https://github.com/ahui2016/mj.js
+- 如果需要修改本软件的前端代码，可以直接修改 public/ts/dist 里的 js 文件。
+- 也可修改 public/ts/src 文件夹内的 ts 文件，修改后在 public/ts/ 文件夹内执行 tsc 命令即可自动重新生成必要的 js 文件。
