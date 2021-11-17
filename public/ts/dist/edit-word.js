@@ -5,8 +5,8 @@ let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const Title = cc('h1', { text: 'Add a new item' });
-const InfoBtn = cc('a', { text: 'Info', classes: 'ml-2', attr: {
-        href: '/public/word-info.html?id=' + wordID
+const InfoBtn = cc('a', { text: 'View', classes: 'ml-2', attr: {
+        href: '/public/word-info.html?id=' + wordID, target: '_blank'
     } });
 const naviBar = m('div').addClass('text-right').append(util.LinkElem('/', { text: 'Home' }), m(InfoBtn).hide());
 const CN_Input = create_input();

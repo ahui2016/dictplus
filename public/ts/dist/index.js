@@ -109,7 +109,7 @@ function initNewWords() {
 }
 function WordItem(w) {
     const self = cc('div', { id: w.ID, classes: 'WordItem', children: [
-            m('div').addClass('WordIDArea').append(span(`[id:${w.ID}]`), util.LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true }).addClass('ml-2'), util.LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true }).addClass('ml-2')),
+            m('div').addClass('WordIDArea').append(span(`[id:${w.ID}]`).addClass('text-grey'), util.LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true }).addClass('ml-2'), util.LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true }).addClass('ml-2')),
             m('div').addClass('WordLangs'),
             m('div').addClass('WordNotes').hide(),
         ] });
