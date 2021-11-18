@@ -47,3 +47,7 @@
 - mj.js 是一个受 Mithril.js 启发的基于 jQuery 实现的极简框架，对于曾经用过 jQuery 的人来说，学习成本接近零。详见 https://github.com/ahui2016/mj.js
 - 如果需要修改本软件的前端代码，可以直接修改 public/ts/dist 里的 js 文件。
 - 也可修改 public/ts/src 文件夹内的 ts 文件，修改后在 public/ts/ 文件夹内执行 tsc 命令即可重新生成必要的 js 文件。
+
+## 截图
+
+![screenshot-02](public/screenshot-02.webp)
