@@ -1,7 +1,7 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
 import { m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
-const NotesLimit = 64;
+const NotesLimit = 80;
 const HistoryLimit = 30;
 let History = [];
 let isAllChecked = false;
@@ -76,6 +76,7 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
                 appendToList(WordList, words.map(WordItem));
                 if (!SuccessOnce) {
                     SuccessOnce = true;
+                    Alerts.clear();
                     HistoryArea.elem().insertAfter(WordList.elem());
                 }
             });
@@ -157,11 +158,16 @@ function getFields() {
     });
     return fields;
 }
+function isEnglish(s) {
+    const size = new Blob([s]).size;
+    return s.length * 2 >= size;
+}
 function limited_notes(notes) {
-    if (notes.length <= NotesLimit) {
+    const limit = isEnglish(notes) ? NotesLimit * 2 : NotesLimit;
+    if (notes.length <= limit) {
         return notes;
     }
-    return notes.substr(0, NotesLimit) + '...';
+    return notes.substr(0, limit) + '...';
 }
 function count_words() {
     util.ajax({ method: 'GET', url: '/api/count-words', alerts: Alerts }, resp => {

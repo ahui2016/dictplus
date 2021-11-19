@@ -2,7 +2,7 @@
 import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
-const NotesLimit = 64;
+const NotesLimit = 80;
 const HistoryLimit = 30;
 let History: Array<string> = [];
 let isAllChecked = false;
@@ -93,6 +93,7 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
           appendToList(WordList, words.map(WordItem));
           if (!SuccessOnce) {
             SuccessOnce = true;
+            Alerts.clear();
             HistoryArea.elem().insertAfter(WordList.elem());
           }
         });
@@ -206,11 +207,17 @@ function getFields(): Array<string> {
   return fields;
 }
 
+function isEnglish(s: string): boolean {
+  const size = new Blob([s]).size;
+  return s.length * 2 >= size;
+}
+
 function limited_notes(notes: string): string {
-  if (notes.length <= NotesLimit) {
+  const limit = isEnglish(notes) ? NotesLimit*2 : NotesLimit;  
+  if (notes.length <= limit) {
     return notes;
   }
-  return notes.substr(0, NotesLimit) + '...';
+  return notes.substr(0, limit) + '...';
 }
 
 function count_words(): void {
