@@ -5,10 +5,10 @@ let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const Title = cc('h1', { text: 'Add a new item' });
-const InfoBtn = cc('a', { text: 'View', classes: 'ml-2', attr: {
+const ViewBtn = cc('a', { text: 'View', classes: 'ml-2', attr: {
         href: '/public/word-info.html?id=' + wordID, target: '_blank'
     } });
-const naviBar = m('div').addClass('text-right').append(util.LinkElem('/', { text: 'Home' }), m(InfoBtn).hide());
+const naviBar = m('div').addClass('text-right').append(util.LinkElem('/', { text: 'Home' }), m(ViewBtn).hide());
 const CN_Input = create_input();
 const EN_Input = create_input();
 const JP_Input = create_input();
@@ -22,6 +22,7 @@ const SubmitAlerts = util.CreateAlerts();
 const SubmitBtn = cc('button', { id: 'submit', text: 'submit' }); // 这个按钮是隐藏不用的，为了防止按回车键提交表单
 const AddBtn = cc('button', { text: 'Add', classes: 'btn btn-fat' });
 const UpdateBtn = cc('button', { text: 'Update', classes: 'btn btn-fat' });
+const DelBtn = cc('a', { text: 'delete', classes: 'ml-2', attr: { href: '#' } });
 const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
         create_item(CN_Input, 'CN', ''),
         create_item(EN_Input, 'EN', ''),
@@ -43,7 +44,7 @@ const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
                 wordID = resp.message;
                 Alerts.insert('success', `添加项目成功 (id:${wordID})`);
                 Form.elem().hide();
-                InfoBtn.elem().show().attr({ href: '/public/word-info.html?id=' + wordID });
+                ViewBtn.elem().show().attr({ href: '/public/word-info.html?id=' + wordID });
             });
         }), m(UpdateBtn).on('click', e => {
             e.preventDefault();
@@ -51,6 +52,21 @@ const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
             util.ajax({ method: 'POST', url: '/api/update-word', alerts: SubmitAlerts, buttonID: UpdateBtn.id, contentType: 'json', body: body }, () => {
                 SubmitAlerts.insert('success', '更新成功');
             });
+        }).hide(), m(DelBtn).on('click', e => {
+            e.preventDefault();
+            util.disable(DelBtn);
+            SubmitAlerts.insert('danger', '当 delete 按钮变红时，再点击一次可删除该词条，不可恢复。');
+            setTimeout(() => {
+                util.enable(DelBtn);
+                DelBtn.elem().css('color', 'red').off().on('click', e => {
+                    e.preventDefault();
+                    util.ajax({ method: 'POST', url: '/api/delete-word', alerts: SubmitAlerts, body: { id: wordID } }, () => {
+                        Alerts.clear().insert('success', '已彻底删除该词条。');
+                        Form.elem().hide();
+                        ViewBtn.elem().hide();
+                    });
+                });
+            }, 2000);
         }).hide()),
     ] });
 $('#root').append(m(Title), naviBar, m(Loading), m(Alerts), m(Form).hide());
@@ -68,8 +84,9 @@ function init() {
     util.ajax({ method: 'POST', url: '/api/get-word', alerts: Alerts, body: { id: wordID } }, resp => {
         const word = resp;
         Form.elem().show();
-        InfoBtn.elem().show();
+        ViewBtn.elem().show();
         UpdateBtn.elem().show();
+        DelBtn.elem().show();
         AddBtn.elem().hide();
         CN_Input.elem().val(word.CN);
         EN_Input.elem().val(word.EN);
@@ -113,9 +130,3 @@ function create_input(type = 'text') {
 function create_item(comp, name, description) {
     return m('div').addClass('mb-3').append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
 }
-window.delete_forever = () => {
-    util.ajax({ method: 'POST', url: '/api/delete-word', alerts: SubmitAlerts, body: { id: wordID } }, () => {
-        Alerts.clear().insert('success', '已彻底删除该项目，不可恢复。');
-        Form.elem().hide();
-    });
-};

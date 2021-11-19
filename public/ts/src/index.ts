@@ -108,7 +108,7 @@ function clear_list(list: mjComponent): void {
 const Footer = cc('div', {classes:'text-center',children:[
   util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
   m('br'),
-  span('version: 2021-11-15').addClass('text-grey'),
+  span('version: 2021-11-19').addClass('text-grey'),
 ]});
 
 $('#root').append(
@@ -149,7 +149,7 @@ function initNewWords() {
 function WordItem(w: util.Word): mjComponent {
   const self = cc('div', {id:w.ID, classes:'WordItem', children:[
     m('div').addClass('WordIDArea').append(
-      span(`[id:${w.ID}]`).addClass('text-grey'),
+      span(`[id: ${w.ID}]`).addClass('text-grey'),
       util.LinkElem('/public/edit-word.html?id='+w.ID,{text:'edit',blank:true}).addClass('ml-2'),
       util.LinkElem('/public/word-info.html?id='+w.ID,{text:'view',blank:true}).addClass('ml-2'),
     ),

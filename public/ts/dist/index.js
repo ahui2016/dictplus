@@ -88,7 +88,7 @@ function clear_list(list) {
 const Footer = cc('div', { classes: 'text-center', children: [
         util.LinkElem('https://github.com/ahui2016/dictplus', { blank: true }),
         m('br'),
-        span('version: 2021-11-15').addClass('text-grey'),
+        span('version: 2021-11-19').addClass('text-grey'),
     ] });
 $('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
 init();
@@ -110,7 +110,7 @@ function initNewWords() {
 }
 function WordItem(w) {
     const self = cc('div', { id: w.ID, classes: 'WordItem', children: [
-            m('div').addClass('WordIDArea').append(span(`[id:${w.ID}]`).addClass('text-grey'), util.LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true }).addClass('ml-2'), util.LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true }).addClass('ml-2')),
+            m('div').addClass('WordIDArea').append(span(`[id: ${w.ID}]`).addClass('text-grey'), util.LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true }).addClass('ml-2'), util.LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true }).addClass('ml-2')),
             m('div').addClass('WordLangs'),
             m('div').addClass('WordNotes').hide(),
         ] });

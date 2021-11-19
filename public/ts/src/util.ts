@@ -34,7 +34,11 @@ export function getUrlParam(param: string): string {
   return queryString.get(param) ?? ''
 }
 
-export function disable(id: string): void {
+/**
+ * @param name is a mjComponent or the mjComponent's id
+ */
+export function disable(name: string|mjComponent): void {
+  const id = typeof name == 'string' ? name : name.id;
   const nodeName = $(id).prop('nodeName');
   if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
     $(id).prop('disabled', true);
@@ -43,7 +47,11 @@ export function disable(id: string): void {
   }
 }
 
-export function enable(id: string): void {
+/**
+ * @param name is a mjComponent or the mjComponent's id
+ */
+ export function enable(name: string|mjComponent): void {
+  const id = typeof name == 'string' ? name : name.id;
   const nodeName = $(id).prop('nodeName');
   if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
     $(id).prop('disabled', false);

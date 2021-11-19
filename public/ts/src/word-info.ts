@@ -11,9 +11,14 @@ const titleArea = m('div').addClass('text-center').append(
   m('h1').text('Details of an item')
 );
 
+const EditBtn = cc('a', {
+  text:'Edit',
+  attr:{href:'/public/edit-word.html?id='+wordID},
+  classes:'ml-2',
+});
 const naviBar = m('div').addClass('text-right').append(
   util.LinkElem('/',{text:'Home'}),
-  util.LinkElem('/public/edit-word.html?id='+wordID, {text:'Edit'}).addClass('ml-2'),
+  m(EditBtn).hide(),
 );
 
 interface WordInfoList extends mjComponent {
@@ -25,12 +30,37 @@ WordInfo.append = (key:string, value:string|mjElement) => {
   return WordInfo;
 };
 
+const DelBtn = cc('a', {text:'delete',classes:'ml-2',attr:{href:'#'}});
+const SubmitAlerts = util.CreateAlerts();
+const BtnArea = cc('div',{classes:'text-center my-5',children:[
+  m(SubmitAlerts).addClass('mb-3'),
+  m(DelBtn).on('click', e => {
+    e.preventDefault();
+    util.disable(DelBtn);
+    SubmitAlerts.insert('danger', '当 delete 按钮变红时，再点击一次可删除该词条，不可恢复。');
+    setTimeout(() => {
+      util.enable(DelBtn);
+      DelBtn.elem().css('color','red').off().on('click', e => {
+        e.preventDefault();
+        util.ajax({method:'POST',url:'/api/delete-word',alerts:SubmitAlerts,buttonID:DelBtn.id,body:{id:wordID}},
+          () => {
+            Alerts.clear().insert('success', '已彻底删除该词条。');
+            WordInfo.elem().hide();
+            EditBtn.elem().hide();
+            BtnArea.elem().hide();
+          });
+      });
+    }, 2000);
+  }),
+]});
+
 $('#root').append(
   titleArea,
   naviBar,
   m(Loading),
   m(Alerts),
   m(WordInfo).hide(),
+  m(BtnArea).hide(),
 );
 
 init();
@@ -52,6 +82,8 @@ function init() {
       const Notes = cc('pre', {classes:'WordNotes'});
       const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD HH:mm:ss');
 
+      EditBtn.elem().show();
+      BtnArea.elem().show();
       WordInfo.elem().show();
       WordInfo
         .append('ID', w.ID)
@@ -92,10 +124,3 @@ function create_table_row(key:string,value:string|mjElement): mjElement {
   }
   return tr;
 }
-
-(window as any).delete_forever = () => {
-  util.ajax({method:'POST',url:'/api/delete-word',alerts:Alerts,body:{id:wordID}},
-    () => {
-      Alerts.clear().insert('danger', '已彻底删除该项目，不可恢复。');
-    });
-};

@@ -10,7 +10,11 @@ export function getUrlParam(param) {
     const queryString = new URLSearchParams(document.location.search);
     return (_a = queryString.get(param)) !== null && _a !== void 0 ? _a : '';
 }
-export function disable(id) {
+/**
+ * @param name is a mjComponent or the mjComponent's id
+ */
+export function disable(name) {
+    const id = typeof name == 'string' ? name : name.id;
     const nodeName = $(id).prop('nodeName');
     if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
         $(id).prop('disabled', true);
@@ -19,7 +23,11 @@ export function disable(id) {
         $(id).css('pointer-events', 'none');
     }
 }
-export function enable(id) {
+/**
+ * @param name is a mjComponent or the mjComponent's id
+ */
+export function enable(name) {
+    const id = typeof name == 'string' ? name : name.id;
     const nodeName = $(id).prop('nodeName');
     if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
         $(id).prop('disabled', false);
