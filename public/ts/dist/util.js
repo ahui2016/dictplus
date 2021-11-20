@@ -204,6 +204,6 @@ export function create_textarea(rows = 3) {
 export function create_input(type = 'text') {
     return cc('input', { attr: { type: type } });
 }
-export function create_item(comp, name, description) {
-    return m('div').addClass('mb-3').append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
+export function create_item(comp, name, description, classes = 'mb-3') {
+    return m('div').addClass(classes).append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
 }

@@ -100,6 +100,14 @@ func searchHandler(c echo.Context) error {
 	return c.JSON(OK, words)
 }
 
+func getRecentLabels(c echo.Context) error {
+	labels, err := db.GetRecentLabels()
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, strings.Split(labels, "\n"))
+}
+
 func getHistoryHandler(c echo.Context) error {
 	history, err := db.GetHistory()
 	if err != nil {

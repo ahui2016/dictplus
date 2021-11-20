@@ -270,8 +270,8 @@ export function create_textarea(rows: number=3): mjComponent {
 export function create_input(type:string='text'): mjComponent {
   return cc('input', {attr:{type:type}});
 }
-export function create_item(comp: mjComponent, name: string, description: string): mjElement {
-  return m('div').addClass('mb-3').append(
+export function create_item(comp: mjComponent, name: string, description: string, classes='mb-3'): mjElement {
+  return m('div').addClass(classes).append(
     m('label').addClass('form-label').attr({for:comp.raw_id}).text(name),
     m(comp).addClass('form-textinput form-textinput-fat'),
     m('div').addClass('form-text').text(description),

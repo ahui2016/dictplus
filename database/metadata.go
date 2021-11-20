@@ -11,7 +11,8 @@ import (
 const (
 	word_id_key        = "word-id-key"
 	word_id_prefix     = "W"
-	history_id_key     = "history-id-key" // 搜索历史，用换行符分隔
+	history_id_key     = "history-id-key"    // 搜索历史，用换行符分隔
+	recent_labels_key  = "recent-labels-key" // 最近标签，用换行符分隔
 	dictplus_addr_key  = "dictplus-address"
 	localtags_addr_key = "localtags-address"
 )
@@ -77,6 +78,10 @@ func (db *DB) GetHistory() (string, error) {
 
 func (db *DB) UpdateHistory(v string) error {
 	return updateTextValue(history_id_key, v, db.DB)
+}
+
+func (db *DB) GetRecentLabels() (string, error) {
+	return getTextValue(recent_labels_key, db.DB)
 }
 
 func (db *DB) GetSettings() (Settings, error) {

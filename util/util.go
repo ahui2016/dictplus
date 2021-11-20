@@ -73,3 +73,19 @@ func Base64Encode(data []byte) string {
 func Base64Decode(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
 }
+
+// StringIndex returns the index of item in the slice.
+// returns -1 if not found.
+func StringIndex(slice []string, item string) int {
+	for i, v := range slice {
+		if v == item {
+			return i
+		}
+	}
+	return -1
+}
+
+// DeleteFromSlice .
+func DeleteFromSlice(slice []string, i int) []string {
+	return append(slice[:i], slice[i+1:]...)
+}

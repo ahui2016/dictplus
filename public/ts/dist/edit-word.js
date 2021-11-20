@@ -1,5 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { m, cc } from './mj.js';
+import { m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
@@ -13,6 +13,9 @@ const JP_Input = util.create_input();
 const Kana_Input = util.create_input();
 const Other_Input = util.create_input();
 const Label_Input = util.create_input();
+const RecentLabels = cc('div', { children: [
+        span('Recent Labels:').addClass('text-grey'),
+    ] });
 const Notes_Input = util.create_textarea();
 const Links_Input = util.create_textarea();
 const Images_Input = util.create_textarea(2);
@@ -27,7 +30,8 @@ const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
         util.create_item(JP_Input, 'JP', ''),
         util.create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
         util.create_item(Other_Input, 'Other', '其他任何语种'),
-        util.create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）'),
+        util.create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）', 'mb-0'),
+        m(RecentLabels).addClass('mb-3').hide(),
         util.create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等'),
         util.create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
         util.create_item(Images_Input, 'Images', '参考图片的 ID, 用逗号或空格分隔 (该功能需要与 localtags 搭配使用)'),
@@ -74,11 +78,15 @@ function init() {
         $('title').text('Add item - dictplus');
         Loading.hide();
         Form.elem().show();
+        initLabels();
         CN_Input.elem().trigger('focus');
         return;
     }
     $('title').text('Edit item - dictplus');
     Title.elem().text(`Edit item (id:${wordID})`);
+    initForm();
+}
+function initForm() {
     util.ajax({ method: 'POST', url: '/api/get-word', alerts: Alerts, body: { id: wordID } }, resp => {
         const word = resp;
         Form.elem().show();
@@ -96,9 +104,30 @@ function init() {
         Links_Input.elem().val(word.Links);
         Images_Input.elem().val(word.Images);
         CN_Input.elem().trigger('focus');
+        initLabels();
     }, undefined, () => {
         Loading.hide();
     });
+}
+function initLabels() {
+    util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
+        const labels = resp.filter(x => !!x);
+        if (!resp || labels.length == 0) {
+            return;
+        }
+        RecentLabels.elem().show();
+        appendToList(RecentLabels, labels.map(LabelItem));
+    });
+}
+function LabelItem(label) {
+    const self = cc('a', { text: label, attr: { href: '#' }, classes: 'LabelItem badge-grey' });
+    self.init = () => {
+        self.elem().on('click', e => {
+            e.preventDefault();
+            Label_Input.elem().val(label).trigger('focus');
+        });
+    };
+    return self;
 }
 function getFormWord() {
     const links = util.val(Links_Input, 'trim')

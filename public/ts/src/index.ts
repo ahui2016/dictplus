@@ -270,7 +270,7 @@ function initHistory(): void {
   util.ajax({method:'GET',url:'/api/get-history',alerts:Alerts},
     resp => {
       History = (resp as util.Text).message.split(/\r?\n/).filter(h => !!h);
-      if (History.length == 0) {
+      if (!resp || History.length == 0) {
         return;
       }
       HistoryArea.elem().show();

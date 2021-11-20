@@ -88,7 +88,7 @@ function clear_list(list) {
 const Footer = cc('div', { classes: 'text-center', children: [
         util.LinkElem('https://github.com/ahui2016/dictplus', { blank: true }),
         m('br'),
-        span('version: 2021-11-19').addClass('text-grey'),
+        span('version: 2021-11-20').addClass('text-grey'),
     ] });
 $('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
 init();
@@ -208,7 +208,7 @@ function HistoryItem(h) {
 function initHistory() {
     util.ajax({ method: 'GET', url: '/api/get-history', alerts: Alerts }, resp => {
         History = resp.message.split(/\r?\n/).filter(h => !!h);
-        if (History.length == 0) {
+        if (!resp || History.length == 0) {
             return;
         }
         HistoryArea.elem().show();

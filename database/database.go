@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"ahui2016.github.com/dictplus/model"
 	"ahui2016.github.com/dictplus/stmt"
@@ -13,6 +14,7 @@ import (
 
 const (
 	NewWordsLimit        = 30
+	LabelsLimit          = 30
 	PageLimit            = 100 // 搜索结果每页上限
 	defaultDictplusAddr  = "127.0.0.1:80"
 	defaultLocaltagsAddr = "http://127.0.0.1:53549"
@@ -49,9 +51,10 @@ func (db *DB) Open(dbPath string) (err error) {
 	}
 	e1 := initFirstID(word_id_key, word_id_prefix, db.DB)
 	e2 := db.initTextEntry(history_id_key, "")
-	e3 := db.initTextEntry(dictplus_addr_key, defaultDictplusAddr)
-	e4 := db.initTextEntry(localtags_addr_key, defaultLocaltagsAddr)
-	return util.WrapErrors(e1, e2, e3, e4)
+	e3 := db.initTextEntry(recent_labels_key, "")
+	e4 := db.initTextEntry(dictplus_addr_key, defaultDictplusAddr)
+	e5 := db.initTextEntry(localtags_addr_key, defaultLocaltagsAddr)
+	return util.WrapErrors(e1, e2, e3, e4, e5)
 }
 
 func (db *DB) GetWordByID(id string) (w Word, err error) {
@@ -82,11 +85,56 @@ func (db *DB) InsertNewWord(w *Word) (err error) {
 	if err = insertWord(tx, w); err != nil {
 		return
 	}
-	return tx.Commit()
+	if err = updateLabels(w.Label, tx); err != nil {
+		return err
+	}
+	err = tx.Commit()
+	return
+}
+
+// addAndLimit add item into items, and limits the length of items.
+func addAndLimit(item, items string, limit int) string {
+	itemArr := strings.Split(items, "\n")
+	itemArr = addOrMoveToTop(itemArr, item)
+	n := len(itemArr)
+	if n > limit {
+		itemArr = itemArr[:limit]
+	}
+	return strings.Join(itemArr, "\n")
+}
+
+func addOrMoveToTop(items []string, item string) []string {
+	i := util.StringIndex(items, item)
+	if i == 0 {
+		return items
+	}
+	if i > 0 {
+		items = util.DeleteFromSlice(items, i)
+	}
+	return append([]string{item}, items...)
+}
+
+func updateLabels(label string, tx TX) error {
+	labels, err := getTextValue(recent_labels_key, tx)
+	if err != nil {
+		return err
+	}
+	labels = addAndLimit(label, labels, LabelsLimit)
+	return updateTextValue(recent_labels_key, labels, tx)
 }
 
 func (db *DB) UpdateWord(w *Word) error {
-	return updateWord(db.DB, w)
+	tx := db.mustBegin()
+	defer tx.Rollback()
+
+	if err := updateLabels(w.Label, tx); err != nil {
+		return err
+	}
+	if err := updateWord(tx, w); err != nil {
+		return err
+	}
+	err := tx.Commit()
+	return err
 }
 
 func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err error) {
