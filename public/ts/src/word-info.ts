@@ -3,6 +3,7 @@ import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
 let wordID = util.getUrlParam('id');
+let localtagAddr = "http://127.0.0.1:53549";
 
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
@@ -72,6 +73,8 @@ function init() {
     return;
   }
 
+  initLocaltagsAddr();
+
   util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
     resp => {
       const w = resp as util.Word;
@@ -106,12 +109,20 @@ function init() {
       if (w.Images) {
         w.Images.split(', ').forEach(id => {
           Images.elem().append(
-            util.LinkElem(util.imageUrl(id), {text:id, blank:true})
+            util.LinkElem(imageUrl(id), {text:id, blank:true})
           );
         });
       }
     }, undefined, () => {
       Loading.hide();
+    });
+}
+
+function initLocaltagsAddr(): void {
+  util.ajax({method:'GET',url:'/api/get-settings',alerts:Alerts},
+    resp => {
+      const settings = resp as util.Settings;
+      localtagAddr = settings.LocaltagsAddr;
     });
 }
 
@@ -123,4 +134,8 @@ function create_table_row(key:string,value:string|mjElement): mjElement {
     tr.append(m('td').addClass('pl-2').append(value));
   }
   return tr;
+}
+
+function imageUrl(id:string): string {
+  return `${localtagAddr}/mainbucket/${id}`;
 }

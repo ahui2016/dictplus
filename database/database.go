@@ -12,12 +12,15 @@ import (
 )
 
 const (
-	NewWordsLimit = 30
-	PageLimit     = 100 // 搜索结果每页上限
+	NewWordsLimit        = 30
+	PageLimit            = 100 // 搜索结果每页上限
+	defaultDictplusAddr  = "127.0.0.1:80"
+	defaultLocaltagsAddr = "http://127.0.0.1:53549"
 )
 
 type (
-	Word = model.Word
+	Word     = model.Word
+	Settings = model.Settings
 )
 
 type DB struct {
@@ -45,8 +48,10 @@ func (db *DB) Open(dbPath string) (err error) {
 		return
 	}
 	e1 := initFirstID(word_id_key, word_id_prefix, db.DB)
-	e2 := db.initHistory()
-	return util.WrapErrors(e1, e2)
+	e2 := db.initTextEntry(history_id_key, "")
+	e3 := db.initTextEntry(dictplus_addr_key, defaultDictplusAddr)
+	e4 := db.initTextEntry(localtags_addr_key, defaultLocaltagsAddr)
+	return util.WrapErrors(e1, e2, e3, e4)
 }
 
 func (db *DB) GetWordByID(id string) (w Word, err error) {

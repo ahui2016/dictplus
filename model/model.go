@@ -17,3 +17,8 @@ type Word struct {
 	Images string // 用逗号分隔的图片 ID, 与 localtags 搭配使用
 	CTime  int64
 }
+
+type Settings struct {
+	DictplusAddr  string
+	LocaltagsAddr string
+}

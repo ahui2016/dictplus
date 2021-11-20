@@ -7,7 +7,6 @@ export interface Text {
 export interface Num {
   n: number;
 }
-
 export interface Word {
   ID     :string; // ShortID
 	CN     :string;
@@ -21,11 +20,9 @@ export interface Word {
 	Images :string; // 用逗号分隔的图片 ID, 与 localtags 搭配使用
 	CTime  :number;
 }
-
-export const LocaltagsAddr = 'http://127.0.0.1:53549';
-
-export function imageUrl(id:string): string {
-  return `${LocaltagsAddr}/mainbucket/${id}`;
+export interface Settings {
+  DictplusAddr  :string;
+	LocaltagsAddr :string;
 }
 
 // 获取地址栏的参数。
@@ -221,7 +218,7 @@ export function ajax(
 /**
  * @param n 超时限制，单位是秒
  */
-export function ajaxPromise(options: AjaxOptions, n: number): Promise<any> {
+export function ajaxPromise(options: AjaxOptions, n: number=5): Promise<any> {
   const second = 1000;
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => { reject('timeout') }, n*second);
@@ -265,4 +262,18 @@ export function LinkElem(href: string,options?:LinkOptions): mjElement {
   if (options.title) link.attr('title', options.title);
   if (options.blank) link.attr('target', '_blank');
   return link;
+}
+
+export function create_textarea(rows: number=3): mjComponent {
+  return cc('textarea', {classes:'form-textarea', attr:{'rows': rows}});
+}
+export function create_input(type:string='text'): mjComponent {
+  return cc('input', {attr:{type:type}});
+}
+export function create_item(comp: mjComponent, name: string, description: string): mjElement {
+  return m('div').addClass('mb-3').append(
+    m('label').addClass('form-label').attr({for:comp.raw_id}).text(name),
+    m(comp).addClass('form-textinput form-textinput-fat'),
+    m('div').addClass('form-text').text(description),
+  );
 }

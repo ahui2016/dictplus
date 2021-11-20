@@ -116,6 +116,26 @@ func updateHistory(c echo.Context) error {
 	return db.UpdateHistory(history)
 }
 
+func getSettingsHandler(c echo.Context) error {
+	s, err := db.GetSettings()
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, s)
+}
+
+func updateSettings(c echo.Context) error {
+	addr1, e1 := getFormValue(c, "addr1")
+	addr2, e2 := getFormValue(c, "addr2")
+	if err := util.WrapErrors(e1, e2); err != nil {
+		return err
+	}
+	return db.UpdateSettings(Settings{
+		DictplusAddr:  addr1,
+		LocaltagsAddr: addr2,
+	})
+}
+
 // getFormValue gets the c.FormValue(key), trims its spaces,
 // and checks if it is empty or not.
 func getFormValue(c echo.Context, key string) (string, error) {

@@ -2,6 +2,7 @@
 import { m, cc } from './mj.js';
 import * as util from './util.js';
 let wordID = util.getUrlParam('id');
+let localtagAddr = "http://127.0.0.1:53549";
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const titleArea = m('div').addClass('text-center').append(m('h1').text('Details of an item'));
@@ -46,6 +47,7 @@ function init() {
         Alerts.insert('danger', 'the blog id is empty, need a blog id');
         return;
     }
+    initLocaltagsAddr();
     util.ajax({ method: 'POST', url: '/api/get-word', alerts: Alerts, body: { id: wordID } }, resp => {
         const w = resp;
         $('title').text(`Edit (id:${wordID}) - dictplus`);
@@ -75,11 +77,17 @@ function init() {
         }
         if (w.Images) {
             w.Images.split(', ').forEach(id => {
-                Images.elem().append(util.LinkElem(util.imageUrl(id), { text: id, blank: true }));
+                Images.elem().append(util.LinkElem(imageUrl(id), { text: id, blank: true }));
             });
         }
     }, undefined, () => {
         Loading.hide();
+    });
+}
+function initLocaltagsAddr() {
+    util.ajax({ method: 'GET', url: '/api/get-settings', alerts: Alerts }, resp => {
+        const settings = resp;
+        localtagAddr = settings.LocaltagsAddr;
     });
 }
 function create_table_row(key, value) {
@@ -91,4 +99,7 @@ function create_table_row(key, value) {
         tr.append(m('td').addClass('pl-2').append(value));
     }
     return tr;
+}
+function imageUrl(id) {
+    return `${localtagAddr}/mainbucket/${id}`;
 }

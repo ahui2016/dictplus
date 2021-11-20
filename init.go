@@ -10,7 +10,8 @@ import (
 )
 
 type (
-	Word = model.Word
+	Word     = model.Word
+	Settings = model.Settings
 )
 
 const (
@@ -19,12 +20,16 @@ const (
 )
 
 var (
-	password string
-	db       = new(database.DB)
-	addr     = flag.String("addr", "127.0.0.1:80", "local IP address")
+	db   = new(database.DB)
+	addr = flag.String("addr", "", "local IP address")
 )
 
 func init() {
 	flag.Parse()
 	util.Panic(db.Open(dbFileName))
+	if *addr == "" {
+		s, err := db.GetSettings()
+		util.Panic(err)
+		*addr = s.DictplusAddr
+	}
 }

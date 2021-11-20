@@ -20,6 +20,7 @@ const titleArea = m('div').addClass('text-center').append(
 
 const naviBar = m('div').addClass('text-right').append(
   util.LinkElem('/public/edit-word.html', {text:'Add', title:'Add a new item', blank:true}),
+  util.LinkElem('/public/settings.html', {text:'Settings'}).addClass('ml-2'),
 );
 
 const ResultTitle = cc('h3', {text:'Recently Added (最近添加)'});

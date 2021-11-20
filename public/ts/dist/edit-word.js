@@ -5,34 +5,32 @@ let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const Title = cc('h1', { text: 'Add a new item' });
-const ViewBtn = cc('a', { text: 'View', classes: 'ml-2', attr: {
-        href: '/public/word-info.html?id=' + wordID, target: '_blank'
-    } });
+const ViewBtn = cc('a', { text: 'View', classes: 'ml-2' });
 const naviBar = m('div').addClass('text-right').append(util.LinkElem('/', { text: 'Home' }), m(ViewBtn).hide());
-const CN_Input = create_input();
-const EN_Input = create_input();
-const JP_Input = create_input();
-const Kana_Input = create_input();
-const Other_Input = create_input();
-const Label_Input = create_input();
-const Notes_Input = create_textarea();
-const Links_Input = create_textarea();
-const Images_Input = create_textarea(2);
+const CN_Input = util.create_input();
+const EN_Input = util.create_input();
+const JP_Input = util.create_input();
+const Kana_Input = util.create_input();
+const Other_Input = util.create_input();
+const Label_Input = util.create_input();
+const Notes_Input = util.create_textarea();
+const Links_Input = util.create_textarea();
+const Images_Input = util.create_textarea(2);
 const SubmitAlerts = util.CreateAlerts();
 const SubmitBtn = cc('button', { id: 'submit', text: 'submit' }); // 这个按钮是隐藏不用的，为了防止按回车键提交表单
 const AddBtn = cc('button', { text: 'Add', classes: 'btn btn-fat' });
 const UpdateBtn = cc('button', { text: 'Update', classes: 'btn btn-fat' });
 const DelBtn = cc('a', { text: 'delete', classes: 'ml-2', attr: { href: '#' } });
 const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
-        create_item(CN_Input, 'CN', ''),
-        create_item(EN_Input, 'EN', ''),
-        create_item(JP_Input, 'JP', ''),
-        create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
-        create_item(Other_Input, 'Other', '其他任何语种'),
-        create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）'),
-        create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等'),
-        create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
-        create_item(Images_Input, 'Images', '参考图片的 ID, 用逗号或空格分隔 (该功能需要与 localtags 搭配使用)'),
+        util.create_item(CN_Input, 'CN', ''),
+        util.create_item(EN_Input, 'EN', ''),
+        util.create_item(JP_Input, 'JP', ''),
+        util.create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
+        util.create_item(Other_Input, 'Other', '其他任何语种'),
+        util.create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）'),
+        util.create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等'),
+        util.create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
+        util.create_item(Images_Input, 'Images', '参考图片的 ID, 用逗号或空格分隔 (该功能需要与 localtags 搭配使用)'),
         m(SubmitAlerts),
         m('div').addClass('text-center my-5').append(m(SubmitBtn).hide().on('click', e => {
             e.preventDefault();
@@ -84,7 +82,7 @@ function init() {
     util.ajax({ method: 'POST', url: '/api/get-word', alerts: Alerts, body: { id: wordID } }, resp => {
         const word = resp;
         Form.elem().show();
-        ViewBtn.elem().show();
+        ViewBtn.elem().show().attr({ href: '/public/word-info.html?id=' + wordID, target: '_blank' });
         UpdateBtn.elem().show();
         DelBtn.elem().show();
         AddBtn.elem().hide();
@@ -120,13 +118,4 @@ function getFormWord() {
         Images: images,
         CTime: 0
     };
-}
-function create_textarea(rows = 3) {
-    return cc('textarea', { classes: 'form-textarea', attr: { 'rows': rows } });
-}
-function create_input(type = 'text') {
-    return cc('input', { attr: { type: type } });
-}
-function create_item(comp, name, description) {
-    return m('div').addClass('mb-3').append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
 }

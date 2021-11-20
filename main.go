@@ -21,6 +21,8 @@ func main() {
 	api.GET("/count-words", countHandler)
 	api.GET("/get-history", getHistoryHandler)
 	api.POST("/update-history", updateHistory)
+	api.GET("/get-settings", getSettingsHandler)
+	api.POST("/update-settings", updateSettings)
 
 	e.Logger.Fatal(e.Start(*addr))
 }

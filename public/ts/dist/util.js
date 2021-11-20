@@ -1,9 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
 import { m, cc } from './mj.js';
-export const LocaltagsAddr = 'http://127.0.0.1:53549';
-export function imageUrl(id) {
-    return `${LocaltagsAddr}/mainbucket/${id}`;
-}
 // 获取地址栏的参数。
 export function getUrlParam(param) {
     var _a;
@@ -160,7 +156,7 @@ export function ajax(options, onSuccess, onFail, onAlways, onReady) {
 /**
  * @param n 超时限制，单位是秒
  */
-export function ajaxPromise(options, n) {
+export function ajaxPromise(options, n = 5) {
     const second = 1000;
     return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => { reject('timeout'); }, n * second);
@@ -201,4 +197,13 @@ export function LinkElem(href, options) {
     if (options.blank)
         link.attr('target', '_blank');
     return link;
+}
+export function create_textarea(rows = 3) {
+    return cc('textarea', { classes: 'form-textarea', attr: { 'rows': rows } });
+}
+export function create_input(type = 'text') {
+    return cc('input', { attr: { type: type } });
+}
+export function create_item(comp, name, description) {
+    return m('div').addClass('mb-3').append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
 }
