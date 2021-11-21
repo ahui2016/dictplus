@@ -13,9 +13,7 @@ const JP_Input = util.create_input();
 const Kana_Input = util.create_input();
 const Other_Input = util.create_input();
 const Label_Input = util.create_input();
-const RecentLabels = cc('div', { children: [
-        span('Recent Labels:').addClass('text-grey'),
-    ] });
+const RecentLabels = cc('div');
 const Notes_Input = util.create_textarea();
 const Links_Input = util.create_textarea();
 const Images_Input = util.create_textarea(2);
@@ -30,8 +28,8 @@ const Form = cc('form', { attr: { 'autocomplete': 'off' }, children: [
         util.create_item(JP_Input, 'JP', ''),
         util.create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
         util.create_item(Other_Input, 'Other', '其他任何语种'),
-        util.create_item(Label_Input, 'Label', '一个标签，通常用来记录出处（书名或文章名）', 'mb-0'),
-        m(RecentLabels).addClass('mb-3').hide(),
+        util.create_item(Label_Input, 'Label', '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"）', 'mb-0'),
+        m(RecentLabels).addClass('mb-3'),
         util.create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等'),
         util.create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
         util.create_item(Images_Input, 'Images', '参考图片的 ID, 用逗号或空格分隔 (该功能需要与 localtags 搭配使用)'),
@@ -115,7 +113,7 @@ function initLabels() {
         if (!resp || labels.length == 0) {
             return;
         }
-        RecentLabels.elem().show();
+        RecentLabels.elem().append(span('Recent Labels:').addClass('text-grey'));
         appendToList(RecentLabels, labels.map(LabelItem));
     });
 }
