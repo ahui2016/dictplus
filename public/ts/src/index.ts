@@ -2,9 +2,9 @@
 import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
-(window as any).PageLimit = 100;
 const NotesLimit = 80;
 const HistoryLimit = 30;
+const PageLimit = 100;
 let History: Array<string> = [];
 let isAllChecked = false;
 let SuccessOnce = false;
@@ -19,9 +19,21 @@ const titleArea = m('div').addClass('text-center').append(
   m('div').text('dictplus, 不只是一个词典程序'),
 );
 
+const LimitInput = cc('input',{classes:'form-textinput',attr:{type:'number',min:1,max:9999}});
+const LimitInputArea = cc('div', {classes:'text-right',children:[
+  m('label').text('Page Limit').attr('for',LimitInput.raw_id),
+  m(LimitInput).val(PageLimit).addClass('ml-1').css('width','4em'),
+]});
+
+const LimitBtn = cc('a', {text:'Limit',attr:{href:'#',title:'搜索结果条数上限'},classes:'ml-2'});
 const naviBar = m('div').addClass('text-right').append(
   util.LinkElem('/public/edit-word.html', {text:'Add', title:'Add a new item', blank:true}),
   util.LinkElem('/public/settings.html', {text:'Settings'}).addClass('ml-2'),
+  m(LimitBtn).on('click', e => {
+    e.preventDefault();
+    LimitBtn.elem().css('visibility', 'hidden');
+    LimitInputArea.elem().show();
+  }),
 );
 
 const ResultTitle = cc('h3', {text:'Recently Added (最近添加)'});
@@ -82,7 +94,16 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
 
       SearchAlerts.insert('primary', 'searching: '+pattern);      
       updateHistory(pattern);
-      const body = {pattern: pattern, fields: getFields(), limit: (window as any).PageLimit};
+      let limit = parseInt(util.val(LimitInput), 10);
+      if (limit < 1) {
+        limit = 1;
+        LimitInput.elem().val(1);
+      }
+      const body = {
+        pattern: pattern, 
+        fields: getFields(), 
+        limit: limit
+      };
 
       util.ajax({method:'POST',url:'/api/search-words',alerts:SearchAlerts,buttonID:SearchBtn.id,contentType:'json',body:body},
         resp => {
@@ -90,6 +111,10 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
           if (!resp || words.length == 0) {
             SearchAlerts.insert('danger', '找不到 (not found)');
             return;
+          }
+          Alerts.clear();
+          if (words.length >= body.limit) {
+            Alerts.insert('danger', '已达到搜索结果条数的上限, 点击右上角的 Limit 按钮可临时更改上限 (刷新页面会变回默认值)');
           }
           SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
           ResultTitle.elem().text('Results (结果)')
@@ -102,7 +127,6 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
           appendToList(WordList, words.map(WordItem));
           if (!SuccessOnce) {
             SuccessOnce = true;
-            Alerts.clear();
             HistoryArea.elem().insertAfter(WordList.elem());
             RecentLabelsArea.elem().insertAfter(HistoryArea.elem());
           }
@@ -124,6 +148,7 @@ const Footer = cc('div', {classes:'text-center',children:[
 $('#root').append(
   titleArea,
   naviBar,
+  m(LimitInputArea).hide(),
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
   m(SearchForm).addClass('my-5').hide(),
