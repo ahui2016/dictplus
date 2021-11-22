@@ -15,8 +15,9 @@ type (
 )
 
 const (
-	OK         = http.StatusOK
-	dbFileName = "db-dictplus.sqlite"
+	OK               = http.StatusOK
+	dbFileName       = "db-dictplus.sqlite"
+	DefaultPageLimit = 100 // 搜索结果每页上限的默认值，具体值由前端传过来
 )
 
 var (

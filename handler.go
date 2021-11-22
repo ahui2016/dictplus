@@ -88,12 +88,16 @@ func searchHandler(c echo.Context) error {
 	type form struct {
 		Pattern string   `json:"pattern"`
 		Fields  []string `json:"fields"`
+		Limit   int      `json:"limit"`
 	}
 	f := new(form)
 	if err := c.Bind(f); err != nil {
 		return err
 	}
-	words, err := db.GetWords(strings.TrimSpace(f.Pattern), f.Fields)
+	if f.Limit == 0 {
+		f.Limit = DefaultPageLimit
+	}
+	words, err := db.GetWords(strings.TrimSpace(f.Pattern), f.Fields, f.Limit)
 	if err != nil {
 		return err
 	}

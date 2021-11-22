@@ -15,7 +15,6 @@ import (
 const (
 	NewWordsLimit        = 30
 	LabelsLimit          = 30
-	PageLimit            = 100 // 搜索结果每页上限
 	defaultDictplusAddr  = "127.0.0.1:80"
 	defaultLocaltagsAddr = "http://127.0.0.1:53549"
 )
@@ -146,7 +145,7 @@ func (db *DB) UpdateWord(w *Word) error {
 	return err
 }
 
-func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err error) {
+func (db *DB) GetWords(pattern string, fields []string, limit int) (words []*Word, err error) {
 	if len(fields) == 0 {
 		return nil, fmt.Errorf("no field to search")
 	}
@@ -161,7 +160,7 @@ func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err erro
 	if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)
 	} else if len(fields) == 1 && fields[0] == "Label" {
-		rows, err = db.DB.Query(stmt.GetByLabel, pattern+"%", PageLimit)
+		rows, err = db.DB.Query(stmt.GetByLabel, pattern+"%", limit)
 	} else {
 		for i, field := range fields {
 			if i == 0 {
@@ -177,7 +176,7 @@ func (db *DB) GetWords(pattern string, fields []string) (words []*Word, err erro
 		for range fields {
 			args = append(args, pattern)
 		}
-		args = append(args, PageLimit)
+		args = append(args, limit)
 		rows, err = db.DB.Query(query, args...)
 	}
 	defer rows.Close()

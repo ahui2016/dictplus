@@ -2,6 +2,7 @@
 import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
+(window as any).PageLimit = 100;
 const NotesLimit = 80;
 const HistoryLimit = 30;
 let History: Array<string> = [];
@@ -81,7 +82,7 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
 
       SearchAlerts.insert('primary', 'searching: '+pattern);      
       updateHistory(pattern);
-      const body = {pattern: pattern, fields: getFields()};
+      const body = {pattern: pattern, fields: getFields(), limit: (window as any).PageLimit};
 
       util.ajax({method:'POST',url:'/api/search-words',alerts:SearchAlerts,buttonID:SearchBtn.id,contentType:'json',body:body},
         resp => {
