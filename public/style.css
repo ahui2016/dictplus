@@ -116,6 +116,10 @@ a:hover {
   padding: .375rem .75rem;
 }
 
+.img-preview img {
+  width: 100%;
+}
+
 @keyframes blinker {
   50% {
     opacity: 0;

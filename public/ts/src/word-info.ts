@@ -3,7 +3,7 @@ import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
 let wordID = util.getUrlParam('id');
-let localtagAddr = "http://127.0.0.1:53549";
+let localtagsAddr = "http://127.0.0.1:53549";
 
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
@@ -55,6 +55,8 @@ const BtnArea = cc('div',{classes:'text-center my-5',children:[
   }),
 ]});
 
+const ImagesList = cc('div', {classes:'img-preview'});
+
 $('#root').append(
   titleArea,
   naviBar,
@@ -62,6 +64,7 @@ $('#root').append(
   m(Alerts),
   m(WordInfo).hide(),
   m(BtnArea).hide(),
+  m(ImagesList),
 );
 
 init();
@@ -75,55 +78,63 @@ function init() {
 
   initLocaltagsAddr();
 
-  util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
-    resp => {
-      const w = resp as util.Word;
-      $('title').text(`Details (id:${wordID}) - dictplus`);
-
-      const Links = cc('div', {classes:'WordLinks'});
-      const Images = cc('div', {classes:'WordImages'});
-      const Notes = cc('pre', {classes:'WordNotes'});
-      const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD HH:mm:ss');
-
-      EditBtn.elem().show();
-      BtnArea.elem().show();
-      WordInfo.elem().show();
-      WordInfo
-        .append('ID', w.ID)
-        .append('CN', w.CN)
-        .append('EN', w.EN)
-        .append('JP', w.JP)
-        .append('Kana', w.Kana)
-        .append('Other', w.Other)
-        .append('Label', w.Label)
-        .append('Links', m(Links))
-        .append('Images', m(Images))
-        .append('Notes', m(Notes).text(w.Notes))
-        .append('CTime', ctime);
-
-      if (w.Links) {
-        w.Links.split('\n').forEach(link => {
-          Links.elem().append(util.LinkElem(link,{blank:true}));
-        });
-      }
-      if (w.Images) {
-        w.Images.split(', ').forEach(id => {
-          Images.elem().append(
-            util.LinkElem(imageUrl(id), {text:id, blank:true})
-          );
-        });
-      }
-    }, undefined, () => {
-      Loading.hide();
-    });
 }
 
 function initLocaltagsAddr(): void {
   util.ajax({method:'GET',url:'/api/get-settings',alerts:Alerts},
     resp => {
       const settings = resp as util.Settings;
-      localtagAddr = settings.LocaltagsAddr;
+      localtagsAddr = settings.LocaltagsAddr;
+      initWord();
     });
+}
+
+function initWord(): void {
+  util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
+  resp => {
+    const w = resp as util.Word;
+    $('title').text(`Details (id:${wordID}) - dictplus`);
+
+    const Links = cc('div', {classes:'WordLinks'});
+    const Images = cc('div', {classes:'WordImages'});
+    const Notes = cc('pre', {classes:'WordNotes'});
+    const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD HH:mm:ss');
+
+    EditBtn.elem().show();
+    BtnArea.elem().show();
+    WordInfo.elem().show();
+    WordInfo
+      .append('ID', w.ID)
+      .append('CN', w.CN)
+      .append('EN', w.EN)
+      .append('JP', w.JP)
+      .append('Kana', w.Kana)
+      .append('Other', w.Other)
+      .append('Label', w.Label)
+      .append('Links', m(Links))
+      .append('Images', m(Images))
+      .append('Notes', m(Notes).text(w.Notes))
+      .append('CTime', ctime);
+
+    if (w.Links) {
+      w.Links.split('\n').forEach(link => {
+        Links.elem().append(util.LinkElem(link,{blank:true}));
+      });
+    }
+    if (w.Images) {
+      w.Images.split(', ').forEach(id => {
+        const img = imageUrl(id);
+        Images.elem().append(
+          util.LinkElem(img, {text:id, blank:true})
+        );
+        ImagesList.elem().append(
+          m('img').attr({src:img})
+        );
+      });
+    }
+  }, undefined, () => {
+    Loading.hide();
+  });
 }
 
 function create_table_row(key:string,value:string|mjElement): mjElement {
@@ -137,5 +148,5 @@ function create_table_row(key:string,value:string|mjElement): mjElement {
 }
 
 function imageUrl(id:string): string {
-  return `${localtagAddr}/mainbucket/${id}`;
+  return `${localtagsAddr}/mainbucket/${id}`;
 }

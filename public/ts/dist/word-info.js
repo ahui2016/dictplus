@@ -2,7 +2,7 @@
 import { m, cc } from './mj.js';
 import * as util from './util.js';
 let wordID = util.getUrlParam('id');
-let localtagAddr = "http://127.0.0.1:53549";
+let localtagsAddr = "http://127.0.0.1:53549";
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 const titleArea = m('div').addClass('text-center').append(m('h1').text('Details of an item'));
@@ -39,7 +39,8 @@ const BtnArea = cc('div', { classes: 'text-center my-5', children: [
             }, 2000);
         }),
     ] });
-$('#root').append(titleArea, naviBar, m(Loading), m(Alerts), m(WordInfo).hide(), m(BtnArea).hide());
+const ImagesList = cc('div', { classes: 'img-preview' });
+$('#root').append(titleArea, naviBar, m(Loading), m(Alerts), m(WordInfo).hide(), m(BtnArea).hide(), m(ImagesList));
 init();
 function init() {
     if (!wordID) {
@@ -48,6 +49,15 @@ function init() {
         return;
     }
     initLocaltagsAddr();
+}
+function initLocaltagsAddr() {
+    util.ajax({ method: 'GET', url: '/api/get-settings', alerts: Alerts }, resp => {
+        const settings = resp;
+        localtagsAddr = settings.LocaltagsAddr;
+        initWord();
+    });
+}
+function initWord() {
     util.ajax({ method: 'POST', url: '/api/get-word', alerts: Alerts, body: { id: wordID } }, resp => {
         const w = resp;
         $('title').text(`Details (id:${wordID}) - dictplus`);
@@ -77,17 +87,13 @@ function init() {
         }
         if (w.Images) {
             w.Images.split(', ').forEach(id => {
-                Images.elem().append(util.LinkElem(imageUrl(id), { text: id, blank: true }));
+                const img = imageUrl(id);
+                Images.elem().append(util.LinkElem(img, { text: id, blank: true }));
+                ImagesList.elem().append(m('img').attr({ src: img }));
             });
         }
     }, undefined, () => {
         Loading.hide();
-    });
-}
-function initLocaltagsAddr() {
-    util.ajax({ method: 'GET', url: '/api/get-settings', alerts: Alerts }, resp => {
-        const settings = resp;
-        localtagAddr = settings.LocaltagsAddr;
     });
 }
 function create_table_row(key, value) {
@@ -101,5 +107,5 @@ function create_table_row(key, value) {
     return tr;
 }
 function imageUrl(id) {
-    return `${localtagAddr}/mainbucket/${id}`;
+    return `${localtagsAddr}/mainbucket/${id}`;
 }
