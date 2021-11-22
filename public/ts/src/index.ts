@@ -15,7 +15,7 @@ const titleArea = m('div').addClass('text-center').append(
   m('h1').append(
     'dict', span('+').addClass('Plus'),
   ),
-  m('div').text('dictplus, 一个词典程序，但不只是一个词典程序'),
+  m('div').text('dictplus, 不只是一个词典程序'),
 );
 
 const naviBar = m('div').addClass('text-right').append(
@@ -33,6 +33,13 @@ const HistoryArea = cc('div', {children:[
   m('h3').text('History (检索历史)'),
   m('hr'),
   m(HistoryItems),
+]});
+
+const RecentLabels = cc('div');
+const RecentLabelsArea = cc('div', {children:[
+  m('h3').text('Recent Labels (最近标签)'),
+  m('hr'),
+  m(RecentLabels),
 ]});
 
 const CN_Box = create_box('checked');
@@ -96,6 +103,7 @@ const SearchForm = cc('form', {attr:{autocomplete:'off'}, children: [
             SuccessOnce = true;
             Alerts.clear();
             HistoryArea.elem().insertAfter(WordList.elem());
+            RecentLabelsArea.elem().insertAfter(HistoryArea.elem());
           }
         });
     })
@@ -107,9 +115,9 @@ function clear_list(list: mjComponent): void {
 }
 
 const Footer = cc('div', {classes:'text-center',children:[
-  util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
+  // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
   m('br'),
-  span('version: 2021-11-20').addClass('text-grey'),
+  span('version: 2021-11-22').addClass('text-grey'),
 ]});
 
 $('#root').append(
@@ -119,6 +127,7 @@ $('#root').append(
   m(Alerts).addClass('my-5'),
   m(SearchForm).addClass('my-5').hide(),
   m(HistoryArea).addClass('my-5').hide(),
+  m(RecentLabelsArea).addClass('my-5').hide(),
   m(ResultTitle).hide(),
   m(ResultAlerts),
   m(HR).hide(),
@@ -132,6 +141,7 @@ function init() {
   count_words();
   initNewWords();
   initHistory();
+  initLabels();
 }
 
 function initNewWords() {
@@ -158,8 +168,13 @@ function WordItem(w: util.Word): mjComponent {
     m('div').addClass('WordNotes').hide(),
   ]});
   self.init = () => {
+    const i = w.Links.indexOf('\n');
+    const linkText = i >= 0 ? 'links' : 'link';
     if (w.Links) {
-      self.elem().find('.WordIDArea').append(badge('links').addClass('ml-2'));
+      const firstLink = i >= 0 ? w.Links.substring(0, i) : w.Links;
+      self.elem().find('.WordIDArea').append(
+        util.LinkElem(firstLink, {text:linkText,blank:true}).addClass('badge-grey ml-2 cursor-pointer'),
+      );
     }
     if (w.Images) {
       self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
@@ -168,11 +183,7 @@ function WordItem(w: util.Word): mjComponent {
       self.elem().find('.WordIDArea').append(
         badge(w.Label).addClass('ml-2 cursor-pointer').on('click', e => {
           e.preventDefault();
-          SearchInput.elem().val(w.Label);
-          isAllChecked = true;
-          CheckAllBtn.elem().trigger('click');
-          $('input[name=field][value=Label]').prop('checked', true);
-          SearchBtn.elem().trigger('click');
+          selectLabelSearch(w.Label);
         }),
       );
     }
@@ -191,6 +202,14 @@ function WordItem(w: util.Word): mjComponent {
     }
   }
   return self;
+}
+
+function selectLabelSearch(label:string):void {
+  SearchInput.elem().val(label);
+  isAllChecked = true;
+  CheckAllBtn.elem().trigger('click');
+  $('input[name=field][value=Label]').prop('checked', true);
+  SearchBtn.elem().trigger('click');
 }
 
 function getFields(): Array<string> {
@@ -269,12 +288,35 @@ function HistoryItem(h: string): mjComponent {
 function initHistory(): void {
   util.ajax({method:'GET',url:'/api/get-history',alerts:Alerts},
     resp => {
-      History = (resp as util.Text).message.split(/\r?\n/).filter(h => !!h);
+      History = (resp as string[]).filter(x => !!x);
       if (!resp || History.length == 0) {
         return;
       }
       HistoryArea.elem().show();
       refreshHistory();
+    });
+}
+
+function LabelItem(name: string): mjComponent {
+  const self = cc('a', {text:name,attr:{href:'#'},classes:'LabelItem'});
+  self.init = () => {
+    self.elem().on('click', e => {
+      e.preventDefault();
+      selectLabelSearch(name);
+    });
+  };
+  return self;
+}
+
+function initLabels() {
+  util.ajax({method:'GET',url:'/api/get-recent-labels',alerts:Alerts},
+    resp => {
+      const labels = (resp as string[]).filter(x => !!x);
+      if (!resp || labels.length == 0) {
+        return;
+      }
+      RecentLabelsArea.elem().show();
+      appendToList(RecentLabels, labels.map(LabelItem));
     });
 }
 
@@ -284,8 +326,11 @@ function refreshHistory(): void {
 }
 
 function updateHistory(pattern: string): void {
-  const i = History.indexOf(pattern);
-  if (i >= 0) {
+  const i = History.findIndex(x => x.toLowerCase() === pattern.toLowerCase());
+  if (i == 0) {
+    return;
+  }
+  if (i > 0) {
     History.splice(i, 1);
   }
   History.unshift(pattern);

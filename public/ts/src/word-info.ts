@@ -78,7 +78,7 @@ function init() {
   util.ajax({method:'POST',url:'/api/get-word',alerts:Alerts,body:{id:wordID}},
     resp => {
       const w = resp as util.Word;
-      $('title').text(`Edit (id:${wordID}) - dictplus`);
+      $('title').text(`Details (id:${wordID}) - dictplus`);
 
       const Links = cc('div', {classes:'WordLinks'});
       const Images = cc('div', {classes:'WordImages'});

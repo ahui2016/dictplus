@@ -8,7 +8,7 @@ let isAllChecked = false;
 let SuccessOnce = false;
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
-const titleArea = m('div').addClass('text-center').append(m('h1').append('dict', span('+').addClass('Plus')), m('div').text('dictplus, 一个词典程序，但不只是一个词典程序'));
+const titleArea = m('div').addClass('text-center').append(m('h1').append('dict', span('+').addClass('Plus')), m('div').text('dictplus, 不只是一个词典程序'));
 const naviBar = m('div').addClass('text-right').append(util.LinkElem('/public/edit-word.html', { text: 'Add', title: 'Add a new item', blank: true }), util.LinkElem('/public/settings.html', { text: 'Settings' }).addClass('ml-2'));
 const ResultTitle = cc('h3', { text: 'Recently Added (最近添加)' });
 const ResultAlerts = util.CreateAlerts(1);
@@ -19,6 +19,12 @@ const HistoryArea = cc('div', { children: [
         m('h3').text('History (检索历史)'),
         m('hr'),
         m(HistoryItems),
+    ] });
+const RecentLabels = cc('div');
+const RecentLabelsArea = cc('div', { children: [
+        m('h3').text('Recent Labels (最近标签)'),
+        m('hr'),
+        m(RecentLabels),
     ] });
 const CN_Box = create_box('checked');
 const EN_Box = create_box('checked');
@@ -78,6 +84,7 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
                     SuccessOnce = true;
                     Alerts.clear();
                     HistoryArea.elem().insertAfter(WordList.elem());
+                    RecentLabelsArea.elem().insertAfter(HistoryArea.elem());
                 }
             });
         })),
@@ -86,16 +93,17 @@ function clear_list(list) {
     list.elem().html('');
 }
 const Footer = cc('div', { classes: 'text-center', children: [
-        util.LinkElem('https://github.com/ahui2016/dictplus', { blank: true }),
+        // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
         m('br'),
-        span('version: 2021-11-20').addClass('text-grey'),
+        span('version: 2021-11-22').addClass('text-grey'),
     ] });
-$('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
+$('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(RecentLabelsArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
 init();
 function init() {
     count_words();
     initNewWords();
     initHistory();
+    initLabels();
 }
 function initNewWords() {
     const body = { pattern: 'Recently-Added', fields: ['Recently-Added'] };
@@ -115,8 +123,11 @@ function WordItem(w) {
             m('div').addClass('WordNotes').hide(),
         ] });
     self.init = () => {
+        const i = w.Links.indexOf('\n');
+        const linkText = i >= 0 ? 'links' : 'link';
         if (w.Links) {
-            self.elem().find('.WordIDArea').append(badge('links').addClass('ml-2'));
+            const firstLink = i >= 0 ? w.Links.substring(0, i) : w.Links;
+            self.elem().find('.WordIDArea').append(util.LinkElem(firstLink, { text: linkText, blank: true }).addClass('badge-grey ml-2 cursor-pointer'));
         }
         if (w.Images) {
             self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
@@ -124,11 +135,7 @@ function WordItem(w) {
         if (w.Label) {
             self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2 cursor-pointer').on('click', e => {
                 e.preventDefault();
-                SearchInput.elem().val(w.Label);
-                isAllChecked = true;
-                CheckAllBtn.elem().trigger('click');
-                $('input[name=field][value=Label]').prop('checked', true);
-                SearchBtn.elem().trigger('click');
+                selectLabelSearch(w.Label);
             }));
         }
         ['CN', 'EN', 'JP', 'Other'].forEach(lang => {
@@ -143,6 +150,13 @@ function WordItem(w) {
         }
     };
     return self;
+}
+function selectLabelSearch(label) {
+    SearchInput.elem().val(label);
+    isAllChecked = true;
+    CheckAllBtn.elem().trigger('click');
+    $('input[name=field][value=Label]').prop('checked', true);
+    SearchBtn.elem().trigger('click');
 }
 function getFields() {
     const boxes = $('input[name=field]:checked');
@@ -207,7 +221,7 @@ function HistoryItem(h) {
 }
 function initHistory() {
     util.ajax({ method: 'GET', url: '/api/get-history', alerts: Alerts }, resp => {
-        History = resp.message.split(/\r?\n/).filter(h => !!h);
+        History = resp.filter(x => !!x);
         if (!resp || History.length == 0) {
             return;
         }
@@ -215,13 +229,36 @@ function initHistory() {
         refreshHistory();
     });
 }
+function LabelItem(name) {
+    const self = cc('a', { text: name, attr: { href: '#' }, classes: 'LabelItem' });
+    self.init = () => {
+        self.elem().on('click', e => {
+            e.preventDefault();
+            selectLabelSearch(name);
+        });
+    };
+    return self;
+}
+function initLabels() {
+    util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
+        const labels = resp.filter(x => !!x);
+        if (!resp || labels.length == 0) {
+            return;
+        }
+        RecentLabelsArea.elem().show();
+        appendToList(RecentLabels, labels.map(LabelItem));
+    });
+}
 function refreshHistory() {
     HistoryItems.elem().html('');
     appendToList(HistoryItems, History.map(HistoryItem));
 }
 function updateHistory(pattern) {
-    const i = History.indexOf(pattern);
-    if (i >= 0) {
+    const i = History.findIndex(x => x.toLowerCase() === pattern.toLowerCase());
+    if (i == 0) {
+        return;
+    }
+    if (i > 0) {
         History.splice(i, 1);
     }
     History.unshift(pattern);

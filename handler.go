@@ -105,7 +105,7 @@ func getRecentLabels(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(OK, strings.Split(labels, "\n"))
+	return c.JSON(OK, strings.Fields(labels))
 }
 
 func getHistoryHandler(c echo.Context) error {
@@ -113,7 +113,7 @@ func getHistoryHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(OK, Text{history})
+	return c.JSON(OK, strings.Fields(history))
 }
 
 func updateHistory(c echo.Context) error {

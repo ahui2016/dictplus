@@ -160,7 +160,7 @@ function LabelItem(label: string): mjComponent {
   self.init = () => {
     self.elem().on('click', e => {
       e.preventDefault();
-      Label_Input.elem().val(label).trigger('focus');
+      Label_Input.elem().val(util.val(Label_Input)+label).trigger('focus');
     });
   };
   return self;

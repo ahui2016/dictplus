@@ -127,16 +127,22 @@ func updateLabels(label string, tx TX) error {
 }
 
 func (db *DB) UpdateWord(w *Word) error {
+	word, err := db.GetWordByID(w.ID)
+	if err != nil {
+		return err
+	}
 	tx := db.mustBegin()
 	defer tx.Rollback()
 
-	if err := updateLabels(w.Label, tx); err != nil {
+	if w.Label != word.Label {
+		if err = updateLabels(w.Label, tx); err != nil {
+			return err
+		}
+	}
+	if err = updateWord(tx, w); err != nil {
 		return err
 	}
-	if err := updateWord(tx, w); err != nil {
-		return err
-	}
-	err := tx.Commit()
+	err = tx.Commit()
 	return err
 }
 
