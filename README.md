@@ -43,7 +43,7 @@
 
 - 插图功能需要与 [localtags](https://github.com/ahui2016/localtags) 搭配使用，把图片上传到 [localtags](https://github.com/ahui2016/localtags) 后可获得文件 ID。
 - 在添加或编辑词条时，可在 Images 栏内填写 localtags 里的图片文件的 ID。
-- 在查看一个词条的详细信息时，如果有插图，点击其 ID 可打开图片（后续将会改成不用点击，直接在词条的详细信息页面显示全部插图）。
+- 点击 view 按钮查看词条的详细信息即可看到图片，点击图片名称可跳转到 localtags, 方便更改图片名称或删除图片。（参考下面的截图1）
 
 ## 备份
 
@@ -65,5 +65,11 @@
 - 也可修改 public/ts/src 文件夹内的 ts 文件，修改后在 public/ts/ 文件夹内执行 tsc 命令即可重新生成必要的 js 文件。
 
 ## 截图
+
+图1：
+
+![screenshot-03](public/screenshot-03.webp)
+
+图2：
 
 ![screenshot-02](public/screenshot-02.webp)

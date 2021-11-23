@@ -2,6 +2,10 @@
 import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
 import * as util from './util.js';
 
+interface ImageFile {
+  Name: string;
+}
+
 let wordID = util.getUrlParam('id');
 let localtagsAddr = "http://127.0.0.1:53549";
 
@@ -17,9 +21,28 @@ const EditBtn = cc('a', {
   attr:{href:'/public/edit-word.html?id='+wordID},
   classes:'ml-2',
 });
+const DelBtn = cc('a', {text:'delete',classes:'ml-2',attr:{href:'#'}});
 const naviBar = m('div').addClass('text-right').append(
   util.LinkElem('/',{text:'Home'}),
   m(EditBtn).hide(),
+  m(DelBtn).on('click', e => {
+    e.preventDefault();
+    util.disable(DelBtn);
+    Alerts.insert('danger', '当 delete 按钮变红时，再点击一次可删除该词条，不可恢复。');
+    setTimeout(() => {
+      util.enable(DelBtn);
+      DelBtn.elem().css('color','red').off().on('click', e => {
+        e.preventDefault();
+        util.ajax({method:'POST',url:'/api/delete-word',alerts:Alerts,buttonID:DelBtn.id,body:{id:wordID}},
+          () => {
+            Alerts.clear().insert('success', '已彻底删除该词条。');
+            WordInfo.elem().hide();
+            EditBtn.elem().hide();
+            DelBtn.elem().hide();
+          });
+      });
+    }, 2000)
+  }).hide(),
 );
 
 interface WordInfoList extends mjComponent {
@@ -31,40 +54,22 @@ WordInfo.append = (key:string, value:string|mjElement) => {
   return WordInfo;
 };
 
-const DelBtn = cc('a', {text:'delete',classes:'ml-2',attr:{href:'#'}});
-const SubmitAlerts = util.CreateAlerts();
-const BtnArea = cc('div',{classes:'text-center my-5',children:[
-  m(SubmitAlerts).addClass('mb-3'),
-  m(DelBtn).on('click', e => {
-    e.preventDefault();
-    util.disable(DelBtn);
-    SubmitAlerts.insert('danger', '当 delete 按钮变红时，再点击一次可删除该词条，不可恢复。');
-    setTimeout(() => {
-      util.enable(DelBtn);
-      DelBtn.elem().css('color','red').off().on('click', e => {
-        e.preventDefault();
-        util.ajax({method:'POST',url:'/api/delete-word',alerts:SubmitAlerts,buttonID:DelBtn.id,body:{id:wordID}},
-          () => {
-            Alerts.clear().insert('success', '已彻底删除该词条。');
-            WordInfo.elem().hide();
-            EditBtn.elem().hide();
-            BtnArea.elem().hide();
-          });
-      });
-    }, 2000);
-  }),
+const ImagesAlerts = util.CreateAlerts();
+const ImagesList = cc('div', {classes:'ImagesPreview'});
+const ImagesListArea = cc('div', {children:[
+  m('h3').text('Images Preview'),
+  m('hr'),
+  m(ImagesAlerts),
+  m(ImagesList).addClass('my-3'),
 ]});
-
-const ImagesList = cc('div', {classes:'img-preview'});
 
 $('#root').append(
   titleArea,
   naviBar,
   m(Loading),
-  m(Alerts),
+  m(Alerts).addClass('my-5'),
   m(WordInfo).hide(),
-  m(BtnArea).hide(),
-  m(ImagesList),
+  m(ImagesListArea).addClass('my-5').hide(),
 );
 
 init();
@@ -101,7 +106,7 @@ function initWord(): void {
     const ctime = dayjs.unix(w.CTime).format('YYYY-MM-DD HH:mm:ss');
 
     EditBtn.elem().show();
-    BtnArea.elem().show();
+    DelBtn.elem().show();
     WordInfo.elem().show();
     WordInfo
       .append('ID', w.ID)
@@ -122,19 +127,30 @@ function initWord(): void {
       });
     }
     if (w.Images) {
+      ImagesListArea.elem().show();
       w.Images.split(', ').forEach(id => {
         const img = imageUrl(id);
-        Images.elem().append(
-          util.LinkElem(img, {text:id, blank:true})
-        );
-        ImagesList.elem().append(
-          m('img').attr({src:img})
-        );
+        Images.elem().append( span(id) );
+        const ImageItem = cc('div', {id:id,classes:'mb-4'});
+        ImagesList.elem().append(m(ImageItem).append(
+          '↓ ',
+          util.LinkElem(`${localtagsAddr}/light/search?fileid=${id}`, {text:id,blank:true}).addClass('ImageName'),
+          m('img').attr({src:img}),
+        ));
+        fillImageName(id);
       });
     }
   }, undefined, () => {
     Loading.hide();
   });
+}
+
+function fillImageName(id: string): void {
+  util.ajax({method:'POST',url:`${localtagsAddr}/api/search-by-id`,alerts:ImagesAlerts,body:{id:id}},
+    resp => {
+      const files = resp as ImageFile[];
+      $(`#${id} .ImageName`).text(files[0].Name);
+    });
 }
 
 function create_table_row(key:string,value:string|mjElement): mjElement {

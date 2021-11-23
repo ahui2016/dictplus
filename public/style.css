@@ -55,6 +55,9 @@ a:hover {
 .mb-3 {
   margin-bottom: 1rem;
 }
+.mb-4 {
+  margin-bottom: 2rem;
+}
 .mb-5 {
   margin-bottom: 3rem;
 }
@@ -116,7 +119,7 @@ a:hover {
   padding: .375rem .75rem;
 }
 
-.img-preview img {
+.ImagesPreview img {
   width: 100%;
 }
 
