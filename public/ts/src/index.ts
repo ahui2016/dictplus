@@ -142,7 +142,7 @@ function clear_list(list: mjComponent): void {
 const Footer = cc('div', {classes:'text-center',children:[
   // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
   m('br'),
-  span('version: 2021-11-22').addClass('text-grey'),
+  span('version: 2021-11-23').addClass('text-grey'),
 ]});
 
 $('#root').append(
