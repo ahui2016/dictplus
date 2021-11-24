@@ -1,5 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { m, cc } from './mj.js';
+import { m, cc, span } from './mj.js';
 // 获取地址栏的参数。
 export function getUrlParam(param) {
     var _a;
@@ -206,4 +206,21 @@ export function create_input(type = 'text') {
 }
 export function create_item(comp, name, description, classes = 'mb-3') {
     return m('div').addClass(classes).append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
+}
+export function badge(name) {
+    return span(name).addClass('badge-grey');
+}
+/**
+ * @param item is a checkbox or a radio button
+ */
+export function create_check(item, label, title, value // 由于 value 通常等于 label，因此 value 不常用，放在最后
+) {
+    value = value ? value : label;
+    return m('div')
+        .addClass('form-check-inline')
+        .append(m(item).attr({ value: value, title: title }), m('label').text(label).attr({ for: item.raw_id, title: title }));
+}
+export function create_box(type, name, checked = '') {
+    const c = checked ? true : false;
+    return cc('input', { attr: { type: type, name: name }, prop: { checked: c } });
 }

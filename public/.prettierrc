@@ -1,0 +1,37 @@
+{
+  "website-address": "https://prettier.io/docs/en/options.html",
+  "bracketSpacing": false,
+  "endOfLine": "lf",
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "tabWidth": 4,
+  "useTabs": false,
+  "insertPragma": false,
+  "requirePragma": false,
+  "vueIndentScriptAndStyle": false,
+  "embeddedLanguageFormatting": "auto",
+
+  "overrides": [
+    {
+      "files": [ "*.js", "*.ts" ],
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100,
+        "arrowParens": "avoid",
+        "htmlWhitespaceSensitivity": "css",
+        "semi": true,
+        "singleQuote": true,
+        "trailingComma": "es5"
+      }
+    },
+    {
+      "files": [ "*.html" ],
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 120,
+        "bracketSameLine": true
+      }
+    }
+  ]
+}

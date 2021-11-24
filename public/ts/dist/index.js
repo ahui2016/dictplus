@@ -9,14 +9,28 @@ let isAllChecked = false;
 let SuccessOnce = false;
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
-const titleArea = m('div').addClass('text-center').append(m('h1').append('dict', span('+').addClass('Plus')), m('div').text('dictplus, 不只是一个词典程序'));
-const LimitInput = cc('input', { classes: 'form-textinput', attr: { type: 'number', min: 1, max: 9999 } });
-const LimitInputArea = cc('div', { classes: 'text-right', children: [
+const titleArea = m('div')
+    .addClass('text-center')
+    .append(m('h1').append('dict', span('+').addClass('Plus')), m('div').text('dictplus, 不只是一个词典程序'));
+const LimitInput = cc('input', {
+    classes: 'form-textinput',
+    attr: { type: 'number', min: 1, max: 9999 },
+});
+const LimitInputArea = cc('div', {
+    classes: 'text-right',
+    children: [
         m('label').text('Page Limit').attr('for', LimitInput.raw_id),
         m(LimitInput).val(PageLimit).addClass('ml-1').css('width', '4em'),
-    ] });
-const LimitBtn = cc('a', { text: 'Limit', attr: { href: '#', title: '搜索结果条数上限' }, classes: 'ml-2' });
-const naviBar = m('div').addClass('text-right').append(util.LinkElem('/public/edit-word.html', { text: 'Add', title: 'Add a new item', blank: true }), util.LinkElem('/public/settings.html', { text: 'Settings' }).addClass('ml-2'), m(LimitBtn).on('click', e => {
+    ],
+});
+const LimitBtn = cc('a', {
+    text: 'Limit',
+    attr: { href: '#', title: '搜索结果条数上限' },
+    classes: 'ml-2',
+});
+const naviBar = m('div')
+    .addClass('text-right')
+    .append(util.LinkElem('/public/edit-word.html', { text: 'Add', title: 'Add a new item', blank: true }), util.LinkElem('/public/settings.html', { text: 'Settings' }).addClass('ml-2'), m(LimitBtn).on('click', e => {
     e.preventDefault();
     LimitBtn.elem().css('visibility', 'hidden');
     LimitInputArea.elem().show();
@@ -26,47 +40,56 @@ const ResultAlerts = util.CreateAlerts(1);
 const HR = cc('hr');
 const WordList = cc('div');
 const HistoryItems = cc('div');
-const HistoryArea = cc('div', { children: [
-        m('h3').text('History (检索历史)'),
-        m('hr'),
-        m(HistoryItems),
-    ] });
+const HistoryArea = cc('div', {
+    children: [m('h3').text('History (检索历史)'), m('hr'), m(HistoryItems)],
+});
+const AllLabelsBtn = cc('button', { text: 'all labels', classes: '.btn ml-3' });
+AllLabelsBtn.init = () => {
+    AllLabelsBtn.elem().on('click', e => {
+        e.preventDefault();
+        location.href = '/public/labels.html';
+    });
+};
 const RecentLabels = cc('div');
-const RecentLabelsArea = cc('div', { children: [
-        m('h3').text('Recent Labels (最近标签)'),
-        m('hr'),
-        m(RecentLabels),
-    ] });
-const CN_Box = create_box('checked');
-const EN_Box = create_box('checked');
-const JP_Box = create_box('checked');
-const Kana_Box = create_box('checked');
-const Other_Box = create_box('checked');
-const Label_Box = create_box();
-const Notes_Box = create_box();
+const RecentLabelsArea = cc('div', {
+    children: [m('h3').text('Recent Labels (最近标签)'), m('hr'), m(RecentLabels)],
+});
+const boxName = 'field';
+const CN_Box = util.create_box('checkbox', boxName, 'checked');
+const EN_Box = util.create_box('checkbox', boxName, 'checked');
+const JP_Box = util.create_box('checkbox', boxName, 'checked');
+const Kana_Box = util.create_box('checkbox', boxName, 'checked');
+const Other_Box = util.create_box('checkbox', boxName, 'checked');
+const Label_Box = util.create_box('checkbox', boxName);
+const Notes_Box = util.create_box('checkbox', boxName);
 const CheckAllBtn = cc('a', {
-    text: '[all]', classes: 'ml-3',
-    attr: { title: 'check all / uncheck all', href: '#' }
+    text: '[all]',
+    classes: 'ml-3',
+    attr: { title: 'check all / uncheck all', href: '#' },
 });
 const SearchInput = cc('input', { attr: { type: 'text' }, prop: { autofocus: true } });
 const SearchAlerts = util.CreateAlerts(2);
 const SearchBtn = cc('button', { text: 'Search', classes: 'btn btn-fat text-right' });
-const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
-        create_check(CN_Box, 'CN'),
-        create_check(EN_Box, 'EN'),
-        create_check(JP_Box, 'JP'),
-        create_check(Kana_Box, 'Kana'),
-        create_check(Other_Box, 'Other'),
-        create_check(Label_Box, 'Label'),
-        create_check(Notes_Box, 'Notes'),
+const SearchForm = cc('form', {
+    attr: { autocomplete: 'off' },
+    children: [
+        util.create_check(CN_Box, 'CN'),
+        util.create_check(EN_Box, 'EN'),
+        util.create_check(JP_Box, 'JP'),
+        util.create_check(Kana_Box, 'Kana'),
+        util.create_check(Other_Box, 'Other'),
+        util.create_check(Label_Box, 'Label'),
+        util.create_check(Notes_Box, 'Notes'),
         m(CheckAllBtn).on('click', e => {
             e.preventDefault();
-            $('input[name=field]').prop('checked', !isAllChecked);
+            $(`input[name=${boxName}]`).prop('checked', !isAllChecked);
             isAllChecked = !isAllChecked;
         }),
         m(SearchInput).addClass('form-textinput form-textinput-fat'),
         m(SearchAlerts),
-        m('div').addClass('text-center mt-2').append(m(SearchBtn).on('click', e => {
+        m('div')
+            .addClass('text-center mt-2')
+            .append(m(SearchBtn).on('click', e => {
             e.preventDefault();
             const pattern = util.val(SearchInput, 'trim');
             if (!pattern) {
@@ -83,9 +106,16 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
             const body = {
                 pattern: pattern,
                 fields: getFields(),
-                limit: limit
+                limit: limit,
             };
-            util.ajax({ method: 'POST', url: '/api/search-words', alerts: SearchAlerts, buttonID: SearchBtn.id, contentType: 'json', body: body }, resp => {
+            util.ajax({
+                method: 'POST',
+                url: '/api/search-words',
+                alerts: SearchAlerts,
+                buttonID: SearchBtn.id,
+                contentType: 'json',
+                body: body,
+            }, resp => {
                 const words = resp;
                 if (!resp || words.length == 0) {
                     SearchAlerts.insert('danger', '找不到 (not found)');
@@ -111,15 +141,19 @@ const SearchForm = cc('form', { attr: { autocomplete: 'off' }, children: [
                 }
             });
         })),
-    ] });
+    ],
+});
 function clear_list(list) {
     list.elem().html('');
 }
-const Footer = cc('div', { classes: 'text-center', children: [
+const Footer = cc('div', {
+    classes: 'text-center',
+    children: [
         // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
         m('br'),
-        span('version: 2021-11-22').addClass('text-grey'),
-    ] });
+        span('version: 2021-11-23').addClass('text-grey'),
+    ],
+});
 $('#root').append(titleArea, naviBar, m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(RecentLabelsArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
 init();
 function init() {
@@ -140,23 +174,44 @@ function initNewWords() {
     });
 }
 function WordItem(w) {
-    const self = cc('div', { id: w.ID, classes: 'WordItem', children: [
-            m('div').addClass('WordIDArea').append(span(`[id: ${w.ID}]`).addClass('text-grey'), util.LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true }).addClass('ml-2'), util.LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true }).addClass('ml-2')),
+    const self = cc('div', {
+        id: w.ID,
+        classes: 'WordItem',
+        children: [
+            m('div')
+                .addClass('WordIDArea')
+                .append(span(`[id: ${w.ID}]`).addClass('text-grey'), util
+                .LinkElem('/public/edit-word.html?id=' + w.ID, { text: 'edit', blank: true })
+                .addClass('ml-2'), util
+                .LinkElem('/public/word-info.html?id=' + w.ID, { text: 'view', blank: true })
+                .addClass('ml-2')),
             m('div').addClass('WordLangs'),
             m('div').addClass('WordNotes').hide(),
-        ] });
+        ],
+    });
     self.init = () => {
         const i = w.Links.indexOf('\n');
         const linkText = i >= 0 ? 'links' : 'link';
         if (w.Links) {
             const firstLink = i >= 0 ? w.Links.substring(0, i) : w.Links;
-            self.elem().find('.WordIDArea').append(util.LinkElem(firstLink, { text: linkText, blank: true }).addClass('badge-grey ml-2 cursor-pointer'));
+            self
+                .elem()
+                .find('.WordIDArea')
+                .append(util
+                .LinkElem(firstLink, { text: linkText, blank: true })
+                .addClass('badge-grey ml-2 cursor-pointer'));
         }
         if (w.Images) {
-            self.elem().find('.WordIDArea').append(badge('images').addClass('ml-2'));
+            self.elem().find('.WordIDArea').append(util.badge('images').addClass('ml-2'));
         }
         if (w.Label) {
-            self.elem().find('.WordIDArea').append(badge(w.Label).addClass('ml-2 cursor-pointer').on('click', e => {
+            self
+                .elem()
+                .find('.WordIDArea')
+                .append(util
+                .badge(w.Label)
+                .addClass('ml-2 cursor-pointer')
+                .on('click', e => {
                 e.preventDefault();
                 selectLabelSearch(w.Label);
             }));
@@ -164,12 +219,14 @@ function WordItem(w) {
         ['CN', 'EN', 'JP', 'Other'].forEach(lang => {
             const word = w;
             if (word[lang]) {
-                self.elem().find('.WordLangs').append(span(lang + ': ').addClass('text-grey'), word[lang], ' ');
+                self
+                    .elem()
+                    .find('.WordLangs')
+                    .append(span(lang + ': ').addClass('text-grey'), word[lang], ' ');
             }
         });
         if (w.Notes) {
-            self.elem().find('.WordNotes').show()
-                .append(limited_notes(w.Notes)).addClass('text-grey');
+            self.elem().find('.WordNotes').show().append(limited_notes(w.Notes)).addClass('text-grey');
         }
     };
     return self;
@@ -178,11 +235,11 @@ function selectLabelSearch(label) {
     SearchInput.elem().val(label);
     isAllChecked = true;
     CheckAllBtn.elem().trigger('click');
-    $('input[name=field][value=Label]').prop('checked', true);
+    $(`input[name=${boxName}][value=Label]`).prop('checked', true);
     SearchBtn.elem().trigger('click');
 }
 function getFields() {
-    const boxes = $('input[name=field]:checked');
+    const boxes = $(`input[name=${boxName}]:checked`);
     if (boxes.length == 0) {
         return ['CN', 'EN', 'JP', 'Kana', 'Other'];
     }
@@ -220,16 +277,6 @@ function count_words() {
     }, undefined, () => {
         Loading.hide();
     });
-}
-function create_check(box, name) {
-    return m('div').addClass('form-check-inline').append(m(box).attr({ type: 'checkbox', value: name }), m('label').text(name).attr({ for: box.raw_id }));
-}
-function create_box(checked = '') {
-    const c = checked ? true : false;
-    return cc('input', { attr: { type: 'checkbox', name: 'field' }, prop: { checked: c } });
-}
-function badge(name) {
-    return span(name).addClass('badge-grey');
 }
 function HistoryItem(h) {
     const self = cc('a', { text: h, attr: { href: '#' }, classes: 'HistoryItem' });
@@ -269,7 +316,11 @@ function initLabels() {
             return;
         }
         RecentLabelsArea.elem().show();
-        appendToList(RecentLabels, labels.map(LabelItem));
+        const items = labels.map(LabelItem);
+        if (items.length >= 10) {
+            items.push(AllLabelsBtn);
+        }
+        appendToList(RecentLabels, items);
     });
 }
 function refreshHistory() {
@@ -288,7 +339,7 @@ function updateHistory(pattern) {
     if (History.length > HistoryLimit) {
         History.pop();
     }
-    const body = { 'history': History.join('\n') };
+    const body = { history: History.join('\n') };
     util.ajax({ method: 'POST', url: '/api/update-history', alerts: SearchAlerts, body: body }, () => {
         refreshHistory();
     });

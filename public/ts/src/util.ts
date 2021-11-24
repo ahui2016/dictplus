@@ -277,3 +277,34 @@ export function create_item(comp: mjComponent, name: string, description: string
     m('div').addClass('form-text').text(description),
   );
 }
+
+export function badge(name:string): mjElement {
+  return span(name).addClass('badge-grey');
+}
+
+/**
+ * @param item is a checkbox or a radio button
+ */
+export function create_check(
+  item: mjComponent,
+  label: string,
+  title?: string,
+  value?: string // 由于 value 通常等于 label，因此 value 不常用，放在最后
+): mjElement {
+  value = value ? value : label;
+  return m('div')
+    .addClass('form-check-inline')
+    .append(
+      m(item).attr({value: value, title: title}),
+      m('label').text(label).attr({for: item.raw_id, title: title})
+    );
+}
+
+export function create_box(
+  type: 'checkbox' | 'radio',
+  name: string,
+  checked: 'checked' | '' = ''
+): mjComponent {
+  const c = checked ? true : false;
+  return cc('input', {attr: {type: type, name: name}, prop: {checked: c}});
+}

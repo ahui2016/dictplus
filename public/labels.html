@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <link rel="stylesheet" href="/public/style.css" />
+    <script src="/public/jquery.min.js"></script>
+    <script src="/public/dayjs.min.js"></script>
+
+    <title>Labels - dictplus</title>
+
+    <style>
+      .form-check-inline {
+        display: inline;
+      }
+
+      .LabelItem + .LabelItem,
+      .HistoryItem + .HistoryItem,
+      .form-check-inline + .form-check-inline {
+        margin-left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="ts/dist/mj.js"></script>
+    <script type="module" src="ts/dist/util.js"></script>
+    <script type="module" src="ts/dist/labels.js"></script>
+  </body>
+</html>

@@ -17,6 +17,7 @@
   $ cd ~
   $ git clone https://github.com/ahui2016/dictplus.git
   $ cd dictplus
+  $ git checkout tags/2021-11-23 -b 2021-11-23
   $ go build
   $ ./dictplus
   ```
@@ -25,7 +26,7 @@
   $ ./dictplus -addr 127.0.0.1:955
   ```
 
-## 关于搜索
+## 搜索
 
 - 搜索不区分大小写。
 - 默认搜索方式是 "包含", 但当单独搜索 Label 时则采用 "begin with" 方式。
@@ -37,11 +38,11 @@
 - 一个词条如果有链接，在搜索结果列表中就会有 link 按钮
 - 点击 link 按钮相当于点击该词条的第一个链接，更多链接则需要点击 view 查看详细内容
 - 如果该词条有多个链接, 那么 link 按钮的文字会变成 links, 因此如果看到 link 没有复数就知道不需要点击 view 按钮去查看更多链接了
-- 这样设计是为了兼顾功能性与界面的简洁性
+- 这样设计是为了兼顾功能性与界面的简洁
 
 ## 插图
 
-- 插图功能需要与 [localtags](https://github.com/ahui2016/localtags) 搭配使用，把图片上传到 [localtags](https://github.com/ahui2016/localtags) 后可获得文件 ID。
+- 插图功能需要与 [localtags](https://github.com/ahui2016/localtags) 搭配使用，把图片上传到 localtags 后可获得文件 ID。
 - 在添加或编辑词条时，可在 Images 栏内填写 localtags 里的图片文件的 ID。
 - 点击 view 按钮查看词条的详细信息即可看到图片，点击图片名称可跳转到 localtags, 方便更改图片名称或删除图片。（参考下面的截图1）
 
@@ -54,7 +55,14 @@
 
 - 更新前请先备份 db-dictplus.sqlite 文件（通常不备份也不影响更新，只是以防万一，总之常备份准没错）
 - 如果你是下载 zip 包在 Windows 里使用，直接用新文件覆盖旧文件即可（注意别覆盖 db-dictplus.sqlite 文件）。
-- 如果你是通过源码安装，可 git pull, 然后 go build 即可。
+- 如果你是通过源码安装，可使用以下命令 
+  ```
+  $ cd ~/dictplus
+  $ git pull
+  $ git checkout tags/2021-11-23 -b 2021-11-23
+  $ go build
+  $ ./dictplus
+  ```
 - 更新后有时前端会受缓存影响，可在浏览器里按 Ctrl-Shift-R 强制更新。
 
 
