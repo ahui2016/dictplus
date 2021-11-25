@@ -104,6 +104,14 @@ func searchHandler(c echo.Context) error {
 	return c.JSON(OK, words)
 }
 
+func getAllLabels(c echo.Context) error {
+	labels, err := db.GetAllLabels()
+	if err != nil {
+		return err
+	}
+	return c.JSON(OK, labels)
+}
+
 func getRecentLabels(c echo.Context) error {
 	labels, err := db.GetRecentLabels()
 	if err != nil {
@@ -176,9 +184,24 @@ func getWordValue(c echo.Context) (word *Word, err error) {
 	if word.Kana != "" && word.JP == "" {
 		return nil, fmt.Errorf("如果填写了 Kana, 就必须填写 JP")
 	}
-	word.Label = strings.TrimSpace(w.Label)
+	word.Label = normalizeLabel(w.Label)
 	word.Notes = strings.TrimSpace(w.Notes)
 	word.Links = strings.TrimSpace(w.Links)
 	word.Images = strings.TrimSpace(w.Images)
 	return
+}
+
+// Label 由用户自由输入，但可以用分隔符 ("-" 或 "/" 或空格) 来区分大类与小类，
+// 第一个分隔符之前的内容被视为大类，后面的都是小类。
+// 在 Label 专属的搜索页面对大类和小类有合理的特殊处理。
+func normalizeLabel(label string) string {
+	label = strings.TrimSpace(label)
+	label = strings.Join(strings.Fields(label), " ")
+	label = strings.Join(strings.FieldsFunc(label, func(c rune) bool {
+		return c == '-'
+	}), "-")
+	label = strings.Join(strings.FieldsFunc(label, func(c rune) bool {
+		return c == '/'
+	}), "/")
+	return label
 }

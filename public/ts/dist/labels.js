@@ -1,20 +1,38 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { m, cc, span } from './mj.js';
+import { m, cc, appendToList } from './mj.js';
 import * as util from './util.js';
-let isAllChecked = false;
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
+const HintBtn = cc('a', { text: 'Hint', attr: { href: '#', title: '显示说明' } });
+const Hint = cc('div', {
+    classes: 'Hint',
+    children: [
+        m('button')
+            .text('hide')
+            .addClass('btn')
+            .on('click', () => {
+            Hint.elem().hide();
+            HintBtn.elem().css('visibility', 'visible');
+        }),
+        m('ul').append(m('li').text('在添加或编辑词条时，可在采用 "大类-小类" 的形式填写 Label'), m('li').text('比如 "编程-数据库-sql", 其中分隔符可以是 "-" 或 "/" 或空格。'), m('li').text('第一个分隔符前的第一个词被视为大类（比如上面例子中的 "编程"），后面的各个词都是小类（比如上面例子中的 "数据库" 和 "sql"）'), m('li').text('建议搜索大类时采用 Starts With 方式，搜索小类时采用 Contains 或 Ends With 方式（因为在数据库中整个 Label 是作为一个字符串保存的）')),
+    ],
+});
 const titleArea = m('div').addClass('text-center').append(m('h1').text('Search by Labels'));
 const naviBar = m('div')
     .addClass('text-right')
-    .append(util.LinkElem('/', { text: 'Home' }));
+    .append(util.LinkElem('/', { text: 'Home' }), m(HintBtn)
+    .addClass('ml-2')
+    .on('click', e => {
+    e.preventDefault();
+    HintBtn.elem().css('visibility', 'hidden');
+    Hint.elem().show();
+}));
 const radioName = 'mode';
-const radioValues = ['StartWith', 'Contains', 'EndWith', 'wildcard'];
-const radioTitles = ['以此开头', '包含', '以此结尾', '使用通配符'];
+const radioValues = ['StartsWith', 'Contains', 'EndsWith'];
+const radioTitles = ['以此开头', '包含', '以此结尾'];
 const Radio_StartWith = util.create_box('radio', radioName, 'checked');
 const Radio_Contains = util.create_box('radio', radioName);
 const Radio_EndWith = util.create_box('radio', radioName);
-const Radio_wildcard = util.create_box('radio', radioName);
 const SearchInput = cc('input', { attr: { type: 'text' }, prop: { autofocus: true } });
 const SearchAlerts = util.CreateAlerts(2);
 const SearchBtn = cc('button', { text: 'Search', classes: 'btn btn-fat text-right' });
@@ -24,10 +42,6 @@ const SearchForm = cc('form', {
         util.create_check(Radio_StartWith, radioValues[0], radioTitles[0]),
         util.create_check(Radio_Contains, radioValues[1], radioTitles[1]),
         util.create_check(Radio_EndWith, radioValues[2], radioTitles[2]),
-        util.create_check(Radio_wildcard, radioValues[3], radioTitles[3]),
-        span('('),
-        util.LinkElem('https://www.tutorialspoint.com/sqlite/sqlite_like_clause.htm', { text: 'ref', blank: true }),
-        span(')'),
         m(SearchInput).addClass('form-textinput form-textinput-fat'),
         m(SearchAlerts),
         m('div')
@@ -42,9 +56,74 @@ const SearchForm = cc('form', {
         })),
     ],
 });
-$('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide());
+const MainLabelsList = cc('div');
+const MainLabelsArea = cc('div', {
+    classes: 'LabelsArea',
+    children: [m('h3').text('Main Labels (大类)'), m('hr'), m(MainLabelsList).addClass('mt-3')],
+});
+const SubLabelsList = cc('div');
+const SubLabelsArea = cc('div', {
+    classes: 'LabelsArea',
+    children: [m('h3').text('Sub-Labels (小类)'), m('hr'), m(SubLabelsList).addClass('mt-3')],
+});
+const AllLabelsList = cc('div');
+const AllLabelsArea = cc('div', {
+    classes: 'LabelsArea',
+    children: [m('h3').text('All Labels (全部标签)'), m('hr'), m(AllLabelsList).addClass('mt-3')],
+});
+$('#root').append(titleArea, naviBar, m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(Hint).addClass('my-3').hide(), m(SearchForm).addClass('my-5').hide(), m(MainLabelsArea).addClass('my-5').hide(), m(SubLabelsArea).addClass('my-5').hide(), m(AllLabelsArea).addClass('my-5').hide());
 init();
 function init() {
-    Loading.hide();
-    SearchForm.elem().show();
+    initMainLabels();
+}
+function initMainLabels() {
+    util.ajax({ method: 'GET', url: '/api/get-all-labels', alerts: Alerts }, resp => {
+        const allLabels = resp;
+        if (!resp || allLabels.length == 0) {
+            Alerts.insert('danger', '数据库中还没有标签，请在添加或编辑词条时在 Label 栏填写内容。');
+            return;
+        }
+        const mainLabels = allLabels
+            .map(label => label.split(/[\s-/]/).filter(x => !!x)[0])
+            .filter((v, i, a) => noCaseIndexOf(a, v) === i)
+            .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        const subLabels = allLabels
+            .join(' ')
+            .split(/[\s-/]/)
+            .filter(x => !!x)
+            .filter((v, i, a) => noCaseIndexOf(a, v) === i)
+            .filter(x => noCaseIndexOf(mainLabels, x) < 0)
+            .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        allLabels.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        SearchForm.elem().show();
+        $('.LabelsArea').show();
+        initLabels(AllLabelsList, allLabels);
+        initLabels(SubLabelsList, subLabels);
+        initLabels(MainLabelsList, mainLabels);
+    }, undefined, () => {
+        Loading.hide();
+    });
+}
+function initLabels(list, labels) {
+    appendToList(list, labels.map(LabelItem));
+}
+function LabelItem(label) {
+    const self = cc('a', {
+        text: label,
+        attr: { href: '#' },
+        classes: 'LabelItem badge-grey',
+    });
+    self.init = () => {
+        self.elem().on('click', e => {
+            e.preventDefault();
+            SearchInput.elem().val(label).trigger('focus');
+        });
+    };
+    return self;
+}
+function getChecked() {
+    return $(`input[name=${radioName}]:checked`).val();
+}
+function noCaseIndexOf(arr, s) {
+    return arr.findIndex(x => x.toLowerCase() === s.toLowerCase());
 }

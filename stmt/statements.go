@@ -46,6 +46,9 @@ const GetWordByID = `SELECT * FROM word WHERE id=?;`
 
 const CountAllWords = `SELECT count(*) FROM word;`
 
+// 由于要除重，最终会失去顺序，因此这里不用 order by
+const GetAllLabels = `SELECT label FROM word;`
+
 const InsertWord = `INSERT INTO word (
 	id, cn, en, jp, kana, other, label, notes, links, images, ctime
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`

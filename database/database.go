@@ -7,6 +7,7 @@ import (
 
 	"ahui2016.github.com/dictplus/model"
 	"ahui2016.github.com/dictplus/stmt"
+	"ahui2016.github.com/dictplus/stringset"
 	"ahui2016.github.com/dictplus/util"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -190,4 +191,22 @@ func (db *DB) GetWords(pattern string, fields []string, limit int) (words []*Wor
 	}
 	err = rows.Err()
 	return
+}
+
+func (db *DB) GetAllLabels() (labels []string, err error) {
+	rows, err := db.DB.Query(stmt.GetAllLabels)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var label string
+		if err := rows.Scan(&label); err != nil {
+			return nil, err
+		}
+		labels = append(labels, label)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return stringset.Unique(labels), nil
 }
