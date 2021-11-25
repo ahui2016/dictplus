@@ -84,6 +84,9 @@
 
 ## 截图
 
+- 本页面的图片会跟随 github 的 light mode / dark mode 设定而自动切换，参考 [https://v2ex.com/t/817790](https://v2ex.com/t/817790)
+- dictplus 本身也会跟随系统的 light mode / dark mode 设定而自动切换主题。
+
 图1：
 
 ![screenshot-03](public/screenshot-03.webp#gh-light-mode-only)
