@@ -3,7 +3,7 @@
 
 ## 更新记录
 
-- `2021-11-26` 添加了 Label 高级搜索页面
+- `2021-11-26` 添加了 Label 高级搜索页面, 添加了 gitee 仓库方便国内使用
 - `2021-11-25` 在 README 添加了 dark mode 截图（受到 [https://v2ex.com/t/817790](https://v2ex.com/t/817790) 的启发）
 - `2021-11-23` 添加了图片预览功能，（该功能需要与 localtags 配合使用）
 - `2021-11-22` 添加了 Limit 按钮，可设置搜索结果的条数上限
@@ -22,8 +22,9 @@
 ## 安装使用
 
 - Windows 用户可
-[直接下载 exe 文件](https://github.com/ahui2016/dictplus/releases)
-- Mac 或 Linux 先正确安装 [git](https://git-scm.com/downloads) 和 [Go 语言环境](https://golang.google.cn/doc/install) 然后在终端执行以下命令:
+[直接下载 exe 文件](https://github.com/ahui2016/dictplus/releases) (国内下载地址 https://gitee.com/ipelago/dictplus/releases)
+- Mac 或 Linux 先正确安装 [git](https://git-scm.com/downloads) 和 [Go 语言环境](https://golang.google.cn/doc/install) 然后在终端执行以下命令:  
+  (国内用户可使用 `https://gitee.com/ipelago/dictplus.git` 来替换下面 git clone 后的网址)
   ```
   $ cd ~
   $ git clone https://github.com/ahui2016/dictplus.git
@@ -41,7 +42,7 @@
 
 - 搜索不区分大小写。
 - 在首页的 Recent Labels (最近标签) 末尾有一个 all labels 按钮，点击该按钮可进入 Search by Label 页面。
-- 在 Search by Label 页面列出了全部 Label, 并且区分了大类小类，还能选择不同的搜索方式，非常方便。
+- 在 Search by Label 页面列出了全部标签，并且区分了大类小类，还能选择不同的搜索方式，非常方便。
 
 ## 链接
 
@@ -70,7 +71,7 @@
   ```
   $ cd ~/dictplus
   $ git pull
-  $ git checkout tags/2021-11-23 -b 2021-11-23
+  $ git checkout tags/2021-11-26 -b 2021-11-26
   $ go build
   $ ./dictplus
   ```
