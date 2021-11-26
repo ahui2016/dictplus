@@ -16,7 +16,7 @@ const Hint = cc('div', {
             Hint.elem().hide();
             HintBtn.elem().css('visibility', 'visible');
         }),
-        m('ul').append(m('li').text('在添加或编辑词条时，可在采用 "大类-小类" 的形式填写 Label'), m('li').text('比如 "编程-数据库-sql", 其中分隔符可以是 "-" 或 "/" 或空格。'), m('li').text('第一个分隔符前的第一个词被视为大类（比如上面例子中的 "编程"），后面的各个词都是小类（比如上面例子中的 "数据库" 和 "sql"）'), m('li').text('建议搜索大类时采用 Starts With 方式，搜索小类时采用 Contains 或 Ends With 方式（因为在数据库中整个 Label 是作为一个字符串保存的）')),
+        m('ul').append(m('li').text('在添加或编辑词条时，可采用 "大类-小类" 的形式填写 Label'), m('li').text('比如 "编程-数据库-sql", 其中分隔符可以是 "-" 或 "/" 或空格。'), m('li').text('第一个分隔符前的第一个词被视为大类（比如上面例子中的 "编程"），后面的各个词都是小类（比如上面例子中的 "数据库" 和 "sql"）'), m('li').text('建议搜索大类时采用 Starts With 方式，搜索小类时采用 Contains 或 Ends With 方式（因为在数据库中整个 Label 是作为一个字符串保存的）')),
     ],
 });
 const LimitInput = cc('input', {

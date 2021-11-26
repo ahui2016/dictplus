@@ -3,6 +3,7 @@
 
 ## 更新记录
 
+- `2021-11-26` 添加了 Label 高级搜索页面
 - `2021-11-25` 在 README 添加了 dark mode 截图（受到 [https://v2ex.com/t/817790](https://v2ex.com/t/817790) 的启发）
 - `2021-11-23` 添加了图片预览功能，（该功能需要与 localtags 配合使用）
 - `2021-11-22` 添加了 Limit 按钮，可设置搜索结果的条数上限
@@ -10,8 +11,8 @@
 - `2021-11-20` 添加了 Settings 页面，可设置默认端口
 - `2021-11-20` 剪短 Notes 时区分英文与中文，避免英文被剪得太短
 
-![screenshot-01](public/screenshot-01.webp#gh-light-mode-only)
-![screenshot-01](public/screenshot-dark-01.webp#gh-dark-mode-only)
+![screenshot-01](screenshots/screenshot-01.webp#gh-light-mode-only)
+![screenshot-01](screenshots/screenshot-dark-01.webp#gh-dark-mode-only)
 
 ## 用途/目的
 
@@ -39,8 +40,8 @@
 ## 搜索
 
 - 搜索不区分大小写。
-- 默认搜索方式是 "包含", 但当单独搜索 Label 时则采用 "begin with" 方式。
-- 如果想用 "包含" 方式搜索 Label, 可同时勾选 Other + Label 或 Kana + Label, 因为 Other 和 Kana 一般不会含有太多干扰因素。
+- 在首页的 Recent Labels (最近标签) 末尾有一个 all labels 按钮，点击该按钮可进入 Search by Label 页面。
+- 在 Search by Label 页面列出了全部 Label, 并且区分了大类小类，还能选择不同的搜索方式，非常方便。
 
 ## 链接
 
@@ -89,10 +90,10 @@
 
 图1：
 
-![screenshot-03](public/screenshot-03.webp#gh-light-mode-only)
-![screenshot-01](public/screenshot-dark-03.webp#gh-dark-mode-only)
+![screenshot-03](screenshots/screenshot-03.webp#gh-light-mode-only)
+![screenshot-01](screenshots/screenshot-dark-03.webp#gh-dark-mode-only)
 
 图2：
 
-![screenshot-02](public/screenshot-02.webp#gh-light-mode-only)
-![screenshot-01](public/screenshot-dark-02.webp#gh-dark-mode-only)
+![screenshot-02](screenshots/screenshot-02.webp#gh-light-mode-only)
+![screenshot-01](screenshots/screenshot-dark-02.webp#gh-dark-mode-only)

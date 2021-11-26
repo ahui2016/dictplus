@@ -175,8 +175,6 @@ func (db *DB) GetWords(pattern string, fields []string, limit int) (words []Word
 		rows, err = db.getWordsByLabel(fields[1], pattern, limit)
 	} else if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)
-	} else if len(fields) == 1 && fields[0] == "Label" {
-		rows, err = db.DB.Query(stmt.GetByLabel, pattern+"%", limit)
 	} else {
 		for i, field := range fields {
 			if i == 0 {

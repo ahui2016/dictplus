@@ -69,7 +69,7 @@ const EN_Box = util.create_box('checkbox', boxName, 'checked');
 const JP_Box = util.create_box('checkbox', boxName, 'checked');
 const Kana_Box = util.create_box('checkbox', boxName, 'checked');
 const Other_Box = util.create_box('checkbox', boxName, 'checked');
-const Label_Box = util.create_box('checkbox', boxName);
+const Label_Box = util.create_box('checkbox', boxName, 'checked');
 const Notes_Box = util.create_box('checkbox', boxName);
 const CheckAllBtn = cc('a', {
     text: '[all]',
@@ -155,9 +155,6 @@ function searchWords(pattern, limit) {
         let successMsg = '';
         if (search) {
             successMsg = `Search by label ${mode} [${pattern}]`;
-        }
-        else if (body.fields.length == 1 && body.fields[0] == 'Label') {
-            successMsg = `Search by label begin with [${pattern}]`;
         }
         else {
             successMsg = `Search [${pattern}] in ${body.fields.join(', ')}`;
@@ -349,16 +346,6 @@ function initHistory() {
         refreshHistory();
     });
 }
-function LabelItem(name) {
-    const self = cc('a', { text: name, attr: { href: '#' }, classes: 'LabelItem' });
-    self.init = () => {
-        self.elem().on('click', e => {
-            e.preventDefault();
-            selectLabelSearch(name);
-        });
-    };
-    return self;
-}
 function initLabels() {
     util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
         const labels = resp.filter(x => !!x);
@@ -366,7 +353,7 @@ function initLabels() {
             return;
         }
         RecentLabelsArea.elem().show();
-        const items = labels.map(LabelItem);
+        const items = labels.map(HistoryItem);
         if (items.length >= 10) {
             items.push(AllLabelsBtn);
         }
