@@ -70,6 +70,7 @@
 - 如果你是通过源码安装，可使用以下命令 
   ```
   $ cd ~/dictplus
+  $ git checkout main
   $ git pull
   $ git checkout tags/2021-11-26b -b 2021-11-26b
   $ go build
