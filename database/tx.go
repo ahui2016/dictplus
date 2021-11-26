@@ -48,6 +48,17 @@ func insertWord(tx TX, w *Word) error {
 	return err
 }
 
+func scanWords(rows *sql.Rows) (words []Word, err error) {
+	for rows.Next() {
+		w, err := scanWord(rows)
+		if err != nil {
+			return nil, err
+		}
+		words = append(words, w)
+	}
+	return words, rows.Err()
+}
+
 func scanWord(row Row) (w Word, err error) {
 	err = row.Scan(
 		&w.ID,

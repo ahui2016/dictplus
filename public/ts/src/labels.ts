@@ -2,8 +2,12 @@
 import {mjElement, mjComponent, m, cc, span, appendToList} from './mj.js';
 import * as util from './util.js';
 
+const PageLimit = 100;
+
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
+
+const titleArea = m('div').addClass('text-center').append(m('h1').text('Search by Label'));
 
 const HintBtn = cc('a', {text: 'Hint', attr: {href: '#', title: '显示说明'}});
 const Hint = cc('div', {
@@ -17,17 +21,36 @@ const Hint = cc('div', {
         HintBtn.elem().css('visibility', 'visible');
       }),
     m('ul').append(
-      m('li').text('在添加或编辑词条时，可在采用 "大类-小类" 的形式填写 Label'),
+      m('li').text('在添加或编辑词条时，可采用 "大类-小类" 的形式填写 Label'),
       m('li').text('比如 "编程-数据库-sql", 其中分隔符可以是 "-" 或 "/" 或空格。'),
       m('li').text(
         '第一个分隔符前的第一个词被视为大类（比如上面例子中的 "编程"），后面的各个词都是小类（比如上面例子中的 "数据库" 和 "sql"）'
       ),
-      m('li').text('建议搜索大类时采用 Starts With 方式，搜索小类时采用 Contains 或 Ends With 方式（因为在数据库中整个 Label 是作为一个字符串保存的）'),
+      m('li').text(
+        '建议搜索大类时采用 Starts With 方式，搜索小类时采用 Contains 或 Ends With 方式（因为在数据库中整个 Label 是作为一个字符串保存的）'
+      )
     ),
   ],
 });
 
-const titleArea = m('div').addClass('text-center').append(m('h1').text('Search by Labels'));
+const LimitInput = cc('input', {
+  classes: 'form-textinput',
+  attr: {type: 'number', min: 1, max: 9999},
+});
+const LimitInputArea = cc('div', {
+  classes: 'text-right',
+  children: [
+    m('label').text('Page Limit').attr('for', LimitInput.raw_id),
+    m(LimitInput).val(PageLimit).addClass('ml-1').css('width', '4em'),
+  ],
+});
+
+const LimitBtn = cc('a', {
+  text: 'Limit',
+  attr: {href: '#', title: '搜索结果条数上限'},
+  classes: 'ml-2',
+});
+
 const naviBar = m('div')
   .addClass('text-right')
   .append(
@@ -38,7 +61,12 @@ const naviBar = m('div')
         e.preventDefault();
         HintBtn.elem().css('visibility', 'hidden');
         Hint.elem().show();
-      })
+      }),
+    m(LimitBtn).on('click', e => {
+      e.preventDefault();
+      LimitBtn.elem().css('visibility', 'hidden');
+      LimitInputArea.elem().show();
+    })
   );
 
 const radioName = 'mode';
@@ -68,6 +96,11 @@ const SearchForm = cc('form', {
             SearchInput.elem().trigger('focus');
             return;
           }
+          let href = `/?mode=${getChecked()}&search=${encodeURIComponent(pattern)}`;
+          if (parseInt(util.val(LimitInput), 10) != PageLimit) {
+            href += `&limit=${util.val(LimitInput)}`;
+          }
+          location.href = href;
         })
       ),
   ],
@@ -94,6 +127,7 @@ const AllLabelsArea = cc('div', {
 $('#root').append(
   titleArea,
   naviBar,
+  m(LimitInputArea).hide(),
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
   m(Hint).addClass('my-3').hide(),

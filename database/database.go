@@ -146,7 +146,20 @@ func (db *DB) UpdateWord(w *Word) error {
 	return err
 }
 
-func (db *DB) GetWords(pattern string, fields []string, limit int) (words []*Word, err error) {
+func (db *DB) getWordsByLabel(mode, pattern string, limit int) (*sql.Rows, error) {
+	if mode == "StartsWith" {
+		pattern = pattern + "%"
+	} else if mode == "Contains" {
+		pattern = "%" + pattern + "%"
+	} else if mode == "EndsWith" {
+		pattern = "%" + pattern
+	} else {
+		return nil, fmt.Errorf("unknown mode [], the mode should be StartsWith or Contains or EndsWith")
+	}
+	return db.DB.Query(stmt.GetByLabel, pattern, limit)
+}
+
+func (db *DB) GetWords(pattern string, fields []string, limit int) (words []Word, err error) {
 	if len(fields) == 0 {
 		return nil, fmt.Errorf("no field to search")
 	}
@@ -158,7 +171,9 @@ func (db *DB) GetWords(pattern string, fields []string, limit int) (words []*Wor
 
 	query := "SELECT * FROM word where"
 
-	if fields[0] == "Recently-Added" {
+	if fields[0] == "SearchByLabel" {
+		rows, err = db.getWordsByLabel(fields[1], pattern, limit)
+	} else if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)
 	} else if len(fields) == 1 && fields[0] == "Label" {
 		rows, err = db.DB.Query(stmt.GetByLabel, pattern+"%", limit)
@@ -180,16 +195,11 @@ func (db *DB) GetWords(pattern string, fields []string, limit int) (words []*Wor
 		args = append(args, limit)
 		rows, err = db.DB.Query(query, args...)
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		w, err := scanWord(rows)
-		if err != nil {
-			return nil, err
-		}
-		words = append(words, &w)
+	if err != nil {
+		return nil, err
 	}
-	err = rows.Err()
+	defer rows.Close()
+	words, err = scanWords(rows)
 	return
 }
 

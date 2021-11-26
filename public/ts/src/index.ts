@@ -9,14 +9,19 @@ let History: Array<string> = [];
 let isAllChecked = false;
 let SuccessOnce = false;
 
+let mode = util.getUrlParam('mode');
+let search = util.getUrlParam('search');
+const searchLimit = util.getUrlParam('limit');
+
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 
+const SubTitle = cc('div');
 const titleArea = m('div')
   .addClass('text-center')
   .append(
     m('h1').append('dict', span('+').addClass('Plus')),
-    m('div').text('dictplus, 不只是一个词典程序')
+    m(SubTitle).text('dictplus, 不只是一个词典程序')
   );
 
 const LimitInput = cc('input', {
@@ -36,17 +41,18 @@ const LimitBtn = cc('a', {
   attr: {href: '#', title: '搜索结果条数上限'},
   classes: 'ml-2',
 });
-const naviBar = m('div')
-  .addClass('text-right')
-  .append(
+const NaviBar = cc('div', {
+  classes: 'text-right',
+  children: [
     util.LinkElem('/public/edit-word.html', {text: 'Add', title: 'Add a new item', blank: true}),
     util.LinkElem('/public/settings.html', {text: 'Settings'}).addClass('ml-2'),
     m(LimitBtn).on('click', e => {
       e.preventDefault();
       LimitBtn.elem().css('visibility', 'hidden');
       LimitInputArea.elem().show();
-    })
-  );
+    }),
+  ],
+});
 
 const ResultTitle = cc('h3', {text: 'Recently Added (最近添加)'});
 const ResultAlerts = util.CreateAlerts(1);
@@ -121,54 +127,69 @@ const SearchForm = cc('form', {
             limit = 1;
             LimitInput.elem().val(1);
           }
-          const body = {
-            pattern: pattern,
-            fields: getFields(),
-            limit: limit,
-          };
-
-          util.ajax(
-            {
-              method: 'POST',
-              url: '/api/search-words',
-              alerts: SearchAlerts,
-              buttonID: SearchBtn.id,
-              contentType: 'json',
-              body: body,
-            },
-            resp => {
-              const words = resp as util.Word[];
-              if (!resp || words.length == 0) {
-                SearchAlerts.insert('danger', '找不到 (not found)');
-                return;
-              }
-              Alerts.clear();
-              if (words.length >= body.limit) {
-                Alerts.insert(
-                  'danger',
-                  '已达到搜索结果条数的上限, 点击右上角的 Limit 按钮可临时更改上限 (刷新页面会变回默认值)'
-                );
-              }
-              SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
-              ResultTitle.elem().text('Results (结果)');
-              let successMsg = `Search [${pattern}] in ${body.fields.join(', ')}`;
-              if (body.fields.length == 1 && body.fields[0] == 'Label') {
-                successMsg = `Search by label begin with [${pattern}]`;
-              }
-              ResultAlerts.insert('success', successMsg);
-              clear_list(WordList);
-              appendToList(WordList, words.map(WordItem));
-              if (!SuccessOnce) {
-                SuccessOnce = true;
-                HistoryArea.elem().insertAfter(WordList.elem());
-                RecentLabelsArea.elem().insertAfter(HistoryArea.elem());
-              }
-            }
-          );
+          searchWords(pattern, limit);
         })
       ),
   ],
 });
+
+function searchWords(pattern: string, limit: number): void {
+  const body = {pattern: pattern, fields: getFields(), limit: limit};
+  if (search) {
+    body.fields = ['SearchByLabel', mode];
+  }
+  util.ajax(
+    {
+      method: 'POST',
+      url: '/api/search-words',
+      alerts: SearchAlerts,
+      buttonID: SearchBtn.id,
+      contentType: 'json',
+      body: body,
+    },
+    resp => {
+      const words = resp as util.Word[];
+      if (!resp || words.length == 0) {
+        if (!search) {
+          SearchAlerts.insert('danger', '找不到 (not found)');
+        } else {
+          ResultAlerts.insert('danger', '找不到 (not found)');
+        }
+        return;
+      }
+      if (!search) {
+        Alerts.clear();
+      }
+      let searchLimitWarning =
+        '已达到搜索结果条数的上限, 点击右上角的 Limit 按钮可临时更改上限 (刷新页面会变回默认值)';
+      if (searchLimit) {
+        searchLimitWarning =
+          '已达到搜索结果条数的上限，可按后退键退回 Search by Label 页面点击右上角的 Limit 按钮修改上限';
+      }
+      if (words.length >= body.limit) {
+        Alerts.insert('danger', searchLimitWarning);
+      }
+      SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
+      ResultTitle.elem().text('Results (结果)');
+      let successMsg = '';
+      if (search) {
+        successMsg = `Search by label ${mode} [${pattern}]`;
+      } else if (body.fields.length == 1 && body.fields[0] == 'Label') {
+        successMsg = `Search by label begin with [${pattern}]`;
+      } else {
+        successMsg = `Search [${pattern}] in ${body.fields.join(', ')}`;
+      }
+      ResultAlerts.insert('success', successMsg);
+      clear_list(WordList);
+      appendToList(WordList, words.map(WordItem));
+      if (!SuccessOnce) {
+        SuccessOnce = true;
+        HistoryArea.elem().insertAfter(WordList.elem());
+        RecentLabelsArea.elem().insertAfter(HistoryArea.elem());
+      }
+    }
+  );
+}
 
 function clear_list(list: mjComponent): void {
   list.elem().html('');
@@ -179,13 +200,13 @@ const Footer = cc('div', {
   children: [
     // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
     m('br'),
-    span('version: 2021-11-23').addClass('text-grey'),
+    span('version: 2021-11-26').addClass('text-grey'),
   ],
 });
 
 $('#root').append(
   titleArea,
-  naviBar,
+  m(NaviBar),
   m(LimitInputArea).hide(),
   m(Loading).addClass('my-5'),
   m(Alerts).addClass('my-5'),
@@ -202,13 +223,35 @@ $('#root').append(
 init();
 
 function init() {
-  count_words();
-  initNewWords();
-  initHistory();
-  initLabels();
+  if (!search) {
+    count_words();
+    initNewWords();
+    initHistory();
+    initLabels();
+  } else {
+    Loading.hide();
+    SubTitle.elem().text('Label 高级搜索结果专用页面');
+    NaviBar.elem().hide();
+    initSearchByLabel();
+  }
 }
 
-function initNewWords() {
+function initSearchByLabel(): void {
+  Alerts.insert('primary', '可按浏览器的后退键回到 Search by Label 页面重新搜索');
+  Alerts.insert('primary', `正在采用 ${mode} 方式检索 Label[${search}]...`);
+
+  ResultTitle.elem().show().text('Results (结果)');
+  HR.elem().show();
+  search = decodeURIComponent(search);
+  mode = !mode ? 'StartsWith' : mode;
+  if (searchLimit) {
+    LimitInput.elem().val(parseInt(searchLimit, 10));
+  }
+  SearchInput.elem().val(search);
+  SearchBtn.elem().trigger('click');
+}
+
+function initNewWords(): void {
   const body = {pattern: 'Recently-Added', fields: ['Recently-Added']};
   util.ajax(
     {method: 'POST', url: '/api/search-words', alerts: Alerts, contentType: 'json', body: body},

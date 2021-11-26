@@ -19,6 +19,12 @@ type Number struct {
 	N int64 `json:"n"`
 }
 
+type SearchForm struct {
+	Pattern string   `json:"pattern"`
+	Fields  []string `json:"fields"`
+	Limit   int      `json:"limit"`
+}
+
 func sleep(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		time.Sleep(time.Second)
@@ -85,12 +91,7 @@ func countHandler(c echo.Context) error {
 }
 
 func searchHandler(c echo.Context) error {
-	type form struct {
-		Pattern string   `json:"pattern"`
-		Fields  []string `json:"fields"`
-		Limit   int      `json:"limit"`
-	}
-	f := new(form)
+	f := new(SearchForm)
 	if err := c.Bind(f); err != nil {
 		return err
 	}
