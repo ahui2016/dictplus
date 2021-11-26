@@ -2,3 +2,4 @@
 db-dictplus.sqlite
 *.exe
 node_modules
+*.zip

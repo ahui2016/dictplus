@@ -111,14 +111,14 @@ function initMainLabels() {
         }
         const mainLabels = allLabels
             .map(label => label.split(/[\s-/]/).filter(x => !!x)[0])
-            .filter((v, i, a) => noCaseIndexOf(a, v) === i)
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重
             .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         const subLabels = allLabels
             .join(' ')
             .split(/[\s-/]/)
             .filter(x => !!x)
-            .filter((v, i, a) => noCaseIndexOf(a, v) === i)
-            .filter(x => noCaseIndexOf(mainLabels, x) < 0)
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重
+            .filter(x => util.noCaseIndexOf(mainLabels, x) < 0)
             .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         allLabels.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         SearchForm.elem().show();
@@ -149,7 +149,4 @@ function LabelItem(label) {
 }
 function getChecked() {
     return $(`input[name=${radioName}]:checked`).val();
-}
-function noCaseIndexOf(arr, s) {
-    return arr.findIndex(x => x.toLowerCase() === s.toLowerCase());
 }

@@ -418,7 +418,9 @@ function initHistory(): void {
 
 function initLabels() {
   util.ajax({method: 'GET', url: '/api/get-recent-labels', alerts: Alerts}, resp => {
-    const labels = (resp as string[]).filter(x => !!x);
+    const labels = (resp as string[])
+      .filter(x => !!x)
+      .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重并不打乱位置
     if (!resp || labels.length == 0) {
       return;
     }

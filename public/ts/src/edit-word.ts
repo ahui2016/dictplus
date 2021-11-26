@@ -1,5 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { mjElement, mjComponent, m, cc, span, appendToList } from './mj.js';
+import {mjElement, mjComponent, m, cc, span, appendToList} from './mj.js';
 import * as util from './util.js';
 
 let wordID = util.getUrlParam('id');
@@ -7,12 +7,12 @@ let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
 const Alerts = util.CreateAlerts();
 
-const Title = cc('h1', { text: 'Add a new item' });
+const Title = cc('h1', {text: 'Add a new item'});
 
-const ViewBtn = cc('a', { text: 'View', classes: 'ml-2' });
+const ViewBtn = cc('a', {text: 'View', classes: 'ml-2'});
 const naviBar = m('div')
   .addClass('text-right')
-  .append(util.LinkElem('/', { text: 'Home' }), m(ViewBtn).hide());
+  .append(util.LinkElem('/', {text: 'Home'}), m(ViewBtn).hide());
 
 const CN_Input = util.create_input();
 const EN_Input = util.create_input();
@@ -26,17 +26,17 @@ const Links_Input = util.create_textarea();
 const Images_Input = util.create_textarea(2);
 
 const SubmitAlerts = util.CreateAlerts();
-const SubmitBtn = cc('button', { id: 'submit', text: 'submit' }); // 这个按钮是隐藏不用的，为了防止按回车键提交表单
-const AddBtn = cc('button', { text: 'Add', classes: 'btn btn-fat' });
-const UpdateBtn = cc('button', { text: 'Update', classes: 'btn btn-fat' });
+const SubmitBtn = cc('button', {id: 'submit', text: 'submit'}); // 这个按钮是隐藏不用的，为了防止按回车键提交表单
+const AddBtn = cc('button', {text: 'Add', classes: 'btn btn-fat'});
+const UpdateBtn = cc('button', {text: 'Update', classes: 'btn btn-fat'});
 const DelBtn = cc('a', {
   text: 'delete',
   classes: 'ml-2',
-  attr: { href: '#' },
+  attr: {href: '#'},
 });
 
 const Form = cc('form', {
-  attr: { autocomplete: 'off' },
+  attr: {autocomplete: 'off'},
   children: [
     util.create_item(CN_Input, 'CN', ''),
     util.create_item(EN_Input, 'EN', ''),
@@ -64,11 +64,11 @@ const Form = cc('form', {
       .append(
         m(SubmitBtn)
           .hide()
-          .on('click', (e) => {
+          .on('click', e => {
             e.preventDefault();
             return false; // 这个按钮是隐藏不用的，为了防止按回车键提交表单。
           }),
-        m(AddBtn).on('click', (e) => {
+        m(AddBtn).on('click', e => {
           e.preventDefault();
           const body = getFormWord();
           util.ajax(
@@ -80,19 +80,19 @@ const Form = cc('form', {
               contentType: 'json',
               body: body,
             },
-            (resp) => {
+            resp => {
               wordID = (resp as util.Text).message;
-              warningIfNoKana(body, SubmitAlerts);
+              warningIfNoKana(body, Alerts);
               Alerts.insert('success', `添加项目成功 (id:${wordID})`);
               Form.elem().hide();
               ViewBtn.elem()
                 .show()
-                .attr({ href: '/public/word-info.html?id=' + wordID });
+                .attr({href: '/public/word-info.html?id=' + wordID});
             }
           );
         }),
         m(UpdateBtn)
-          .on('click', (e) => {
+          .on('click', e => {
             e.preventDefault();
             const body = getFormWord();
             util.ajax(
@@ -112,7 +112,7 @@ const Form = cc('form', {
           })
           .hide(),
         m(DelBtn)
-          .on('click', (e) => {
+          .on('click', e => {
             e.preventDefault();
             util.disable(DelBtn);
             SubmitAlerts.insert(
@@ -124,14 +124,14 @@ const Form = cc('form', {
               DelBtn.elem()
                 .css('color', 'red')
                 .off()
-                .on('click', (e) => {
+                .on('click', e => {
                   e.preventDefault();
                   util.ajax(
                     {
                       method: 'POST',
                       url: '/api/delete-word',
                       alerts: SubmitAlerts,
-                      body: { id: wordID },
+                      body: {id: wordID},
                     },
                     () => {
                       Alerts.clear().insert('success', '已彻底删除该词条。');
@@ -172,9 +172,9 @@ function initForm() {
       method: 'POST',
       url: '/api/get-word',
       alerts: Alerts,
-      body: { id: wordID },
+      body: {id: wordID},
     },
-    (resp) => {
+    resp => {
       const word = resp as util.Word;
       Form.elem().show();
       ViewBtn.elem()
@@ -208,8 +208,10 @@ function initForm() {
 }
 
 function initLabels() {
-  util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, (resp) => {
-    const labels = (resp as string[]).filter((x) => !!x);
+  util.ajax({method: 'GET', url: '/api/get-recent-labels', alerts: Alerts}, resp => {
+    const labels = (resp as string[])
+      .filter(x => !!x)
+      .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重并不打乱位置
     if (!resp || labels.length == 0) {
       return;
     }
@@ -221,11 +223,11 @@ function initLabels() {
 function LabelItem(label: string): mjComponent {
   const self = cc('a', {
     text: label,
-    attr: { href: '#' },
+    attr: {href: '#'},
     classes: 'LabelItem badge-grey',
   });
   self.init = () => {
-    self.elem().on('click', (e) => {
+    self.elem().on('click', e => {
       e.preventDefault();
       Label_Input.elem()
         .val(util.val(Label_Input) + label)
@@ -239,14 +241,14 @@ function getFormWord(): util.Word {
   const links = util
     .val(Links_Input, 'trim')
     .split(/\s/)
-    .map((w) => w.trim())
-    .filter((w) => !!w)
+    .map(w => w.trim())
+    .filter(w => !!w)
     .join('\n');
 
   const images = util
     .val(Images_Input, 'trim')
     .split(/[,、，\s]/)
-    .filter((w) => !!w)
+    .filter(w => !!w)
     .join(', ');
 
   return {

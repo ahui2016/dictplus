@@ -353,7 +353,9 @@ function initHistory() {
 }
 function initLabels() {
     util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
-        const labels = resp.filter(x => !!x);
+        const labels = resp
+            .filter(x => !!x)
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重
         if (!resp || labels.length == 0) {
             return;
         }

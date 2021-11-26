@@ -224,3 +224,6 @@ export function create_box(type, name, checked = '') {
     const c = checked ? true : false;
     return cc('input', { attr: { type: type, name: name }, prop: { checked: c } });
 }
+export function noCaseIndexOf(arr, s) {
+    return arr.findIndex(x => x.toLowerCase() === s.toLowerCase());
+}

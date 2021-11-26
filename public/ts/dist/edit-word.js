@@ -46,10 +46,10 @@ const Form = cc('form', {
             .addClass('text-center my-5')
             .append(m(SubmitBtn)
             .hide()
-            .on('click', (e) => {
+            .on('click', e => {
             e.preventDefault();
             return false; // 这个按钮是隐藏不用的，为了防止按回车键提交表单。
-        }), m(AddBtn).on('click', (e) => {
+        }), m(AddBtn).on('click', e => {
             e.preventDefault();
             const body = getFormWord();
             util.ajax({
@@ -59,9 +59,9 @@ const Form = cc('form', {
                 buttonID: AddBtn.id,
                 contentType: 'json',
                 body: body,
-            }, (resp) => {
+            }, resp => {
                 wordID = resp.message;
-                warningIfNoKana(body, SubmitAlerts);
+                warningIfNoKana(body, Alerts);
                 Alerts.insert('success', `添加项目成功 (id:${wordID})`);
                 Form.elem().hide();
                 ViewBtn.elem()
@@ -69,7 +69,7 @@ const Form = cc('form', {
                     .attr({ href: '/public/word-info.html?id=' + wordID });
             });
         }), m(UpdateBtn)
-            .on('click', (e) => {
+            .on('click', e => {
             e.preventDefault();
             const body = getFormWord();
             util.ajax({
@@ -85,7 +85,7 @@ const Form = cc('form', {
             });
         })
             .hide(), m(DelBtn)
-            .on('click', (e) => {
+            .on('click', e => {
             e.preventDefault();
             util.disable(DelBtn);
             SubmitAlerts.insert('danger', '当 delete 按钮变红时，再点击一次可删除该词条，不可恢复。');
@@ -94,7 +94,7 @@ const Form = cc('form', {
                 DelBtn.elem()
                     .css('color', 'red')
                     .off()
-                    .on('click', (e) => {
+                    .on('click', e => {
                     e.preventDefault();
                     util.ajax({
                         method: 'POST',
@@ -133,7 +133,7 @@ function initForm() {
         url: '/api/get-word',
         alerts: Alerts,
         body: { id: wordID },
-    }, (resp) => {
+    }, resp => {
         const word = resp;
         Form.elem().show();
         ViewBtn.elem()
@@ -161,8 +161,10 @@ function initForm() {
     });
 }
 function initLabels() {
-    util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, (resp) => {
-        const labels = resp.filter((x) => !!x);
+    util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
+        const labels = resp
+            .filter(x => !!x)
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重
         if (!resp || labels.length == 0) {
             return;
         }
@@ -177,7 +179,7 @@ function LabelItem(label) {
         classes: 'LabelItem badge-grey',
     });
     self.init = () => {
-        self.elem().on('click', (e) => {
+        self.elem().on('click', e => {
             e.preventDefault();
             Label_Input.elem()
                 .val(util.val(Label_Input) + label)
@@ -190,13 +192,13 @@ function getFormWord() {
     const links = util
         .val(Links_Input, 'trim')
         .split(/\s/)
-        .map((w) => w.trim())
-        .filter((w) => !!w)
+        .map(w => w.trim())
+        .filter(w => !!w)
         .join('\n');
     const images = util
         .val(Images_Input, 'trim')
         .split(/[,、，\s]/)
-        .filter((w) => !!w)
+        .filter(w => !!w)
         .join(', ');
     return {
         ID: wordID,
