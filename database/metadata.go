@@ -77,7 +77,15 @@ func (db *DB) GetHistory() (string, error) {
 }
 
 func (db *DB) UpdateHistory(v string) error {
-	return updateTextValue(history_id_key, v, db.DB)
+	oldHistory, err := db.GetHistory()
+	if err != nil {
+		return err
+	}
+	newHistory := addAndLimit(v, oldHistory, HistoryLimit)
+	if newHistory == oldHistory {
+		return nil
+	}
+	return updateTextValue(history_id_key, newHistory, db.DB)
 }
 
 func (db *DB) GetRecentLabels() (string, error) {

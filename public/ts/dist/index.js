@@ -15,7 +15,12 @@ const Alerts = util.CreateAlerts();
 const SubTitle = cc('div');
 const titleArea = m('div')
     .addClass('text-center')
-    .append(m('h1').append('dict', span('+').addClass('Plus')), m(SubTitle).text('dictplus, 不只是一个词典程序'));
+    .append(m('h1')
+    .addClass('cursor-pointer')
+    .append('dict', span('+').addClass('Plus'))
+    .on('click', () => {
+    location.href = '/';
+}), m(SubTitle).text('dictplus, 不只是一个词典程序'));
 const LimitInput = cc('input', {
     classes: 'form-textinput',
     attr: { type: 'number', min: 1, max: 9999 },
@@ -376,7 +381,7 @@ function updateHistory(pattern) {
     if (History.length > HistoryLimit) {
         History.pop();
     }
-    const body = { history: History.join('\n') };
+    const body = { history: pattern };
     util.ajax({ method: 'POST', url: '/api/update-history', alerts: SearchAlerts, body: body }, () => {
         refreshHistory();
     });

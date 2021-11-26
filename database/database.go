@@ -16,6 +16,7 @@ import (
 const (
 	NewWordsLimit        = 30
 	LabelsLimit          = 30
+	HistoryLimit         = 30
 	defaultDictplusAddr  = "127.0.0.1:80"
 	defaultLocaltagsAddr = "http://127.0.0.1:53549"
 )
@@ -104,7 +105,7 @@ func addAndLimit(item, items string, limit int) string {
 }
 
 func addOrMoveToTop(items []string, item string) []string {
-	i := util.StringIndex(items, item)
+	i := util.StringIndexNoCase(items, item)
 	if i == 0 {
 		return items
 	}

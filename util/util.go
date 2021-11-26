@@ -74,11 +74,12 @@ func Base64Decode(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
 }
 
-// StringIndex returns the index of item in the slice.
+// StringIndex returns the index of a string in the slice, case-insensitivly.
 // returns -1 if not found.
-func StringIndex(slice []string, item string) int {
+func StringIndexNoCase(slice []string, item string) int {
+	item = strings.ToLower(item)
 	for i, v := range slice {
-		if v == item {
+		if strings.ToLower(v) == item {
 			return i
 		}
 	}
