@@ -3,13 +3,12 @@
 
 ## 更新记录
 
+这里是简单记录最近的更新情况，更详细的更新说明请看 [Releases](https://github.com/ahui2016/dictplus/releases)
+
+- `2021-11-27` 修复了 [issues/1](https://github.com/ahui2016/dictplus/issues/1), 另外 Label 高级搜索增加了自动切换模式功能
 - `2021-11-26` 添加了 Label 高级搜索页面, 添加了 gitee 仓库方便国内使用
 - `2021-11-25` 在 README 添加了 dark mode 截图（受到 [https://v2ex.com/t/817790](https://v2ex.com/t/817790) 的启发）
-- `2021-11-23` 添加了图片预览功能，（该功能需要与 localtags 配合使用）
-- `2021-11-22` 添加了 Limit 按钮，可设置搜索结果的条数上限
-- `2021-11-20` 在编辑词条及详细信息页面添加了 delete 按钮
 - `2021-11-20` 添加了 Settings 页面，可设置默认端口
-- `2021-11-20` 剪短 Notes 时区分英文与中文，避免英文被剪得太短
 
 ![screenshot-01](screenshots/screenshot-01.webp#gh-light-mode-only)
 ![screenshot-01](screenshots/screenshot-dark-01.webp#gh-dark-mode-only)
@@ -29,7 +28,7 @@
   $ cd ~
   $ git clone https://github.com/ahui2016/dictplus.git
   $ cd dictplus
-  $ git checkout tags/2021-11-26b -b 2021-11-26b
+  $ git checkout tags/2021-11-27 -b 2021-11-27
   $ go build
   $ ./dictplus
   ```
@@ -72,7 +71,7 @@
   $ cd ~/dictplus
   $ git checkout main
   $ git pull
-  $ git checkout tags/2021-11-26b -b 2021-11-26b
+  $ git checkout tags/2021-11-27 -b 2021-11-27
   $ go build
   $ ./dictplus
   ```
@@ -93,9 +92,14 @@
 图1：
 
 ![screenshot-03](screenshots/screenshot-03.webp#gh-light-mode-only)
-![screenshot-01](screenshots/screenshot-dark-03.webp#gh-dark-mode-only)
+![screenshot-03](screenshots/screenshot-dark-03.webp#gh-dark-mode-only)
 
 图2：
 
+![screenshot-04](screenshots/screenshot-04.webp#gh-light-mode-only)
+![screenshot-04](screenshots/screenshot-dark-04.webp#gh-dark-mode-only)
+
+图3：
+
 ![screenshot-02](screenshots/screenshot-02.webp#gh-light-mode-only)
-![screenshot-01](screenshots/screenshot-dark-02.webp#gh-dark-mode-only)
+![screenshot-02](screenshots/screenshot-dark-02.webp#gh-dark-mode-only)

@@ -141,6 +141,11 @@ function searchWords(pattern, limit) {
             }
             else {
                 ResultAlerts.insert('danger', '找不到 (not found)');
+                if (mode == 'StartsWith') {
+                    Alerts.insert('danger', '"StartsWith" 方式无结果，自动转换为 "Contains" 方式搜索...');
+                    mode = 'Contains';
+                    SearchBtn.elem().trigger('click');
+                }
             }
             return;
         }
@@ -182,7 +187,7 @@ const Footer = cc('div', {
     children: [
         // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
         m('br'),
-        span('version: 2021-11-26b').addClass('text-grey'),
+        span('version: 2021-11-27').addClass('text-grey'),
     ],
 });
 $('#root').append(titleArea, m(NaviBar), m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(RecentLabelsArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
