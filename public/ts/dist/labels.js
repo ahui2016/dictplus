@@ -74,7 +74,7 @@ const SearchForm = cc('form', {
                 SearchInput.elem().trigger('focus');
                 return;
             }
-            let href = `/?mode=${getChecked()}&search=${encodeURIComponent(pattern)}`;
+            let href = `/public/index.html/?mode=${getChecked()}&search=${encodeURIComponent(pattern)}`;
             if (parseInt(util.val(LimitInput), 10) != PageLimit) {
                 href += `&limit=${util.val(LimitInput)}`;
             }
@@ -104,20 +104,22 @@ function init() {
 }
 function initMainLabels() {
     util.ajax({ method: 'GET', url: '/api/get-all-labels', alerts: Alerts }, resp => {
-        const allLabels = resp;
+        const allLabels = resp.filter(x => !!x);
         if (!resp || allLabels.length == 0) {
             Alerts.insert('danger', '数据库中还没有标签，请在添加或编辑词条时在 Label 栏填写内容。');
             return;
         }
+        // 注意避免 allLabels 里有字符串而导致产生 undefined 的问题，
+        // 因此要确保 allLabels 里没有空字符串（在上面处理了）。
         const mainLabels = allLabels
             .map(label => label.split(/[\s-/]/).filter(x => !!x)[0])
-            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重并不打乱位置
             .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         const subLabels = allLabels
             .join(' ')
             .split(/[\s-/]/)
             .filter(x => !!x)
-            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i) // 除重并不打乱位置
             .filter(x => util.noCaseIndexOf(mainLabels, x) < 0)
             .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         allLabels.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));

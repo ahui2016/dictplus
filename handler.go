@@ -32,6 +32,15 @@ func sleep(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func jsFile(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if strings.HasSuffix(c.Request().RequestURI, ".js") {
+			c.Response().Header().Set(echo.HeaderContentType, "application/javascript")
+		}
+		return next(c)
+	}
+}
+
 func errorHandler(err error, c echo.Context) {
 	if e, ok := err.(*echo.HTTPError); ok {
 		c.JSON(e.Code, e.Message)
@@ -155,6 +164,17 @@ func updateSettings(c echo.Context) error {
 		DictplusAddr:  addr1,
 		LocaltagsAddr: addr2,
 	})
+}
+
+func publicFileHandler(c echo.Context) error {
+	filename := c.Param("filename")
+	return c.File("public/" + filename)
+}
+
+func scriptsFileHandler(c echo.Context) error {
+	filename := c.Param("filename")
+	c.Response().Header().Set(echo.HeaderContentType, "application/javascript")
+	return c.File("public/ts/dist/" + filename)
 }
 
 // getFormValue gets the c.FormValue(key), trims its spaces,

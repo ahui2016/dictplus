@@ -36,7 +36,7 @@ const Form = cc('form', {
         util.create_item(JP_Input, 'JP', ''),
         util.create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
         util.create_item(Other_Input, 'Other', '其他任何语种'),
-        util.create_item(Label_Input, 'Label', '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"），其中分割符可以是 "-" 或 "/"', 'mb-0'),
+        util.create_item(Label_Input, 'Label', '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"），其中分割符可以是 "-" 或 "/" 或空格', 'mb-0'),
         m(RecentLabels).addClass('mb-3'),
         util.create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等（建议控制字数，尽量简短）'),
         util.create_item(Links_Input, 'Links', '参考网址，请以 http 开头，每行一个网址'),
@@ -164,7 +164,7 @@ function initLabels() {
     util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
         const labels = resp
             .filter(x => !!x)
-            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重并不打乱位置
         if (!resp || labels.length == 0) {
             return;
         }

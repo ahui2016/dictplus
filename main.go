@@ -11,8 +11,15 @@ func main() {
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 	e.HTTPErrorHandler = errorHandler
 
+	e.Use(jsFile)
 	e.Static("/public", "public")
 	e.File("/", "public/index.html")
+	// e.GET("/", func(c echo.Context) error {
+	// 	return c.Redirect(http.StatusFound, "/public/index.html")
+	// })
+	// public := e.Group("/public")
+	// public.GET("/:filename", publicFileHandler)
+	// public.GET("/ts/dist/:filename", scriptsFileHandler)
 
 	api := e.Group("/api", sleep)
 	api.POST("/get-word", getWordHandler)

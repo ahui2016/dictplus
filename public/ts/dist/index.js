@@ -182,7 +182,7 @@ const Footer = cc('div', {
     children: [
         // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
         m('br'),
-        span('version: 2021-11-26').addClass('text-grey'),
+        span('version: 2021-11-26b').addClass('text-grey'),
     ],
 });
 $('#root').append(titleArea, m(NaviBar), m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(RecentLabelsArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
@@ -355,7 +355,7 @@ function initLabels() {
     util.ajax({ method: 'GET', url: '/api/get-recent-labels', alerts: Alerts }, resp => {
         const labels = resp
             .filter(x => !!x)
-            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重
+            .filter((v, i, a) => util.noCaseIndexOf(a, v) === i); // 除重并不打乱位置
         if (!resp || labels.length == 0) {
             return;
         }

@@ -46,7 +46,7 @@ const Form = cc('form', {
     util.create_item(
       Label_Input,
       'Label',
-      '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"），其中分割符可以是 "-" 或 "/"',
+      '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"），其中分割符可以是 "-" 或 "/" 或空格',
       'mb-0'
     ),
     m(RecentLabels).addClass('mb-3'),
