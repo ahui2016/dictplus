@@ -6,7 +6,7 @@
 这里是简单记录最近的更新情况，更详细的更新说明请看 [Releases](https://github.com/ahui2016/dictplus/releases)
 
 - `2021-11-27` 修复了 [issues/1](https://github.com/ahui2016/dictplus/issues/1), 另外 Label 高级搜索增加了自动切换模式功能
-- `2021-11-26` 添加了 Label 高级搜索页面, 添加了 gitee 仓库方便国内使用
+- `2021-11-26` 添加了 Label 高级搜索页面（当最近标签超过 10 个时才会出现入口）, 添加了 gitee 仓库方便国内使用
 - `2021-11-25` 在 README 添加了 dark mode 截图（受到 [https://v2ex.com/t/817790](https://v2ex.com/t/817790) 的启发）
 - `2021-11-20` 添加了 Settings 页面，可设置默认端口
 
@@ -69,13 +69,12 @@
 - 如果你是通过源码安装，可使用以下命令 
   ```
   $ cd ~/dictplus
-  $ git checkout main
   $ git pull
   $ git checkout tags/2021-11-27 -b 2021-11-27
   $ go build
   $ ./dictplus
   ```
-- 更新后有时前端会受缓存影响，可在浏览器里按 Ctrl-Shift-R 强制更新。
+- 更新后有时前端会受缓存影响，可在浏览器里按 Ctrl-Shift-R 强制刷新。
 
 
 ## 本站前端使用 mj.js
