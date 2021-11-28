@@ -13,6 +13,7 @@ const (
 	word_id_prefix     = "W"
 	history_id_key     = "history-id-key"    // 搜索历史，用换行符分隔
 	recent_labels_key  = "recent-labels-key" // 最近标签，用换行符分隔
+	delay_key          = "delay-key"         // 设定后端是否延迟
 	dictplus_addr_key  = "dictplus-address"
 	localtags_addr_key = "localtags-address"
 )
@@ -32,6 +33,11 @@ func getIntValue(key string, tx TX) (value int64, err error) {
 	row := tx.QueryRow(stmt.GetIntValue, key)
 	err = row.Scan(&value)
 	return
+}
+
+func updateIntValue(key string, v int64, tx TX) error {
+	_, err := tx.Exec(stmt.UpdateIntValue, v, key)
+	return err
 }
 
 func getCurrentID(key string, tx TX) (id model.ShortID, err error) {
@@ -72,6 +78,14 @@ func (db *DB) initTextEntry(k, v string) error {
 	return err
 }
 
+func (db *DB) initIntEntry(k string, v int64) error {
+	_, err := getIntValue(k, db.DB)
+	if err == sql.ErrNoRows {
+		err = db.Exec(stmt.InsertIntValue, k, v)
+	}
+	return err
+}
+
 func (db *DB) GetHistory() (string, error) {
 	return getTextValue(history_id_key, db.DB)
 }
@@ -95,11 +109,16 @@ func (db *DB) GetRecentLabels() (string, error) {
 func (db *DB) GetSettings() (Settings, error) {
 	addr1, e1 := getTextValue(dictplus_addr_key, db.DB)
 	addr2, e2 := getTextValue(localtags_addr_key, db.DB)
-	return Settings{DictplusAddr: addr1, LocaltagsAddr: addr2}, util.WrapErrors(e1, e2)
+	delay, e3 := getIntValue(delay_key, db.DB)
+
+	return Settings{
+		DictplusAddr: addr1, LocaltagsAddr: addr2, Delay: util.IntToBool(delay),
+	}, util.WrapErrors(e1, e2, e3)
 }
 
 func (db *DB) UpdateSettings(s Settings) error {
 	e1 := updateTextValue(dictplus_addr_key, s.DictplusAddr, db.DB)
 	e2 := updateTextValue(localtags_addr_key, s.LocaltagsAddr, db.DB)
-	return util.WrapErrors(e1, e2)
+	e3 := updateIntValue(delay_key, util.BoolToInt(s.Delay), db.DB)
+	return util.WrapErrors(e1, e2, e3)
 }

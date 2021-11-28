@@ -27,7 +27,13 @@ type SearchForm struct {
 
 func sleep(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		time.Sleep(time.Second)
+		s, err := db.GetSettings()
+		if err != nil {
+			return err
+		}
+		if s.Delay {
+			time.Sleep(time.Second)
+		}
 		return next(c)
 	}
 }
@@ -155,15 +161,13 @@ func getSettingsHandler(c echo.Context) error {
 }
 
 func updateSettings(c echo.Context) error {
-	addr1, e1 := getFormValue(c, "addr1")
-	addr2, e2 := getFormValue(c, "addr2")
-	if err := util.WrapErrors(e1, e2); err != nil {
+	s := new(Settings)
+	if err := c.Bind(s); err != nil {
 		return err
 	}
-	return db.UpdateSettings(Settings{
-		DictplusAddr:  addr1,
-		LocaltagsAddr: addr2,
-	})
+	s.DictplusAddr = strings.TrimSpace(s.DictplusAddr)
+	s.LocaltagsAddr = strings.TrimSpace(s.LocaltagsAddr)
+	return db.UpdateSettings(*s)
 }
 
 func publicFileHandler(c echo.Context) error {

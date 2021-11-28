@@ -55,7 +55,8 @@ func (db *DB) Open(dbPath string) (err error) {
 	e3 := db.initTextEntry(recent_labels_key, "")
 	e4 := db.initTextEntry(dictplus_addr_key, defaultDictplusAddr)
 	e5 := db.initTextEntry(localtags_addr_key, defaultLocaltagsAddr)
-	return util.WrapErrors(e1, e2, e3, e4, e5)
+	e6 := db.initIntEntry(delay_key, 1)
+	return util.WrapErrors(e1, e2, e3, e4, e5, e6)
 }
 
 func (db *DB) GetWordByID(id string) (w Word, err error) {

@@ -21,4 +21,5 @@ type Word struct {
 type Settings struct {
 	DictplusAddr  string
 	LocaltagsAddr string
+	Delay         bool
 }

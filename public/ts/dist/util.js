@@ -38,10 +38,15 @@ export function CreateLoading(align) {
         classes += ' text-center';
     }
     const loading = cc('div', {
-        text: 'Loading...', classes: classes
+        text: 'Loading...',
+        classes: classes,
     });
-    loading.hide = () => { loading.elem().hide(); };
-    loading.show = () => { loading.elem().show(); };
+    loading.hide = () => {
+        loading.elem().hide();
+    };
+    loading.show = () => {
+        loading.elem().show();
+    };
     return loading;
 }
 /**
@@ -52,7 +57,7 @@ export function CreateAlerts(max) {
     const alerts = cc('div');
     alerts.max = max == undefined ? 3 : max;
     alerts.count = 0;
-    alerts.insertElem = (elem) => {
+    alerts.insertElem = elem => {
         $(alerts.id).prepend(elem);
         alerts.count++;
         if (alerts.max > 0 && alerts.count > alerts.max) {
@@ -159,12 +164,22 @@ export function ajax(options, onSuccess, onFail, onAlways, onReady) {
 export function ajaxPromise(options, n = 5) {
     const second = 1000;
     return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => { reject('timeout'); }, n * second);
-        ajax(options, result => { resolve(result); }, // onSuccess
+        const timeout = setTimeout(() => {
+            reject('timeout');
+        }, n * second);
+        ajax(options, 
         // onSuccess
-        errMsg => { reject(errMsg); }, // onError
-        () => { clearTimeout(timeout); } // onAlways
-        );
+        result => {
+            resolve(result);
+        }, 
+        // onError
+        errMsg => {
+            reject(errMsg);
+        }, 
+        // onAlways
+        () => {
+            clearTimeout(timeout);
+        });
     });
 }
 export function val(obj, trim) {
@@ -199,13 +214,15 @@ export function LinkElem(href, options) {
     return link;
 }
 export function create_textarea(rows = 3) {
-    return cc('textarea', { classes: 'form-textarea', attr: { 'rows': rows } });
+    return cc('textarea', { classes: 'form-textarea', attr: { rows: rows } });
 }
 export function create_input(type = 'text') {
     return cc('input', { attr: { type: type } });
 }
 export function create_item(comp, name, description, classes = 'mb-3') {
-    return m('div').addClass(classes).append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
+    return m('div')
+        .addClass(classes)
+        .append(m('label').addClass('form-label').attr({ for: comp.raw_id }).text(name), m(comp).addClass('form-textinput form-textinput-fat'), m('div').addClass('form-text').text(description));
 }
 export function badge(name) {
     return span(name).addClass('badge-grey');

@@ -90,3 +90,14 @@ func StringIndexNoCase(slice []string, item string) int {
 func DeleteFromSlice(slice []string, i int) []string {
 	return append(slice[:i], slice[i+1:]...)
 }
+
+func BoolToInt(b bool) int64 {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func IntToBool(i int64) bool {
+	return i >= 1
+}

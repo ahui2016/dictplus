@@ -1,5 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { mjElement, mjComponent, m, cc, span } from './mj.js';
+import {mjElement, mjComponent, m, cc, span} from './mj.js';
 
 export interface Text {
   message: string;
@@ -8,33 +8,34 @@ export interface Num {
   n: number;
 }
 export interface Word {
-  ID     :string; // ShortID
-	CN     :string;
-	EN     :string;
-	JP     :string;
-	Kana   :string; // 与 JP 对应的平假名
-  Other  :string; // 其他任何语种
-	Label  :string; // 每个单词只有一个标签，通常用来记录出处（书名或文章名）
-	Notes  :string;
-	Links  :string; // 用换行符分隔的网址
-	Images :string; // 用逗号分隔的图片 ID, 与 localtags 搭配使用
-	CTime  :number;
+  ID: string; // ShortID
+  CN: string;
+  EN: string;
+  JP: string;
+  Kana: string; // 与 JP 对应的平假名
+  Other: string; // 其他任何语种
+  Label: string; // 每个单词只有一个标签，通常用来记录出处（书名或文章名）
+  Notes: string;
+  Links: string; // 用换行符分隔的网址
+  Images: string; // 用逗号分隔的图片 ID, 与 localtags 搭配使用
+  CTime: number;
 }
 export interface Settings {
-  DictplusAddr  :string;
-	LocaltagsAddr :string;
+  DictplusAddr: string;
+  LocaltagsAddr: string;
+  Delay: boolean;
 }
 
 // 获取地址栏的参数。
 export function getUrlParam(param: string): string {
   const queryString = new URLSearchParams(document.location.search);
-  return queryString.get(param) ?? ''
+  return queryString.get(param) ?? '';
 }
 
 /**
  * @param name is a mjComponent or the mjComponent's id
  */
-export function disable(name: string|mjComponent): void {
+export function disable(name: string | mjComponent): void {
   const id = typeof name == 'string' ? name : name.id;
   const nodeName = $(id).prop('nodeName');
   if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
@@ -47,7 +48,7 @@ export function disable(name: string|mjComponent): void {
 /**
  * @param name is a mjComponent or the mjComponent's id
  */
- export function enable(name: string|mjComponent): void {
+export function enable(name: string | mjComponent): void {
   const id = typeof name == 'string' ? name : name.id;
   const nodeName = $(id).prop('nodeName');
   if (nodeName == 'BUTTON' || nodeName == 'INPUT') {
@@ -64,13 +65,21 @@ export interface mjLoading extends mjComponent {
 
 export function CreateLoading(align?: 'center'): mjLoading {
   let classes = 'Loading';
-  if (align == 'center') { classes += ' text-center'; }
+  if (align == 'center') {
+    classes += ' text-center';
+  }
 
   const loading = cc('div', {
-    text:'Loading...',classes:classes}) as mjLoading;
+    text: 'Loading...',
+    classes: classes,
+  }) as mjLoading;
 
-  loading.hide = () => { loading.elem().hide() };
-  loading.show = () => { loading.elem().show() };
+  loading.hide = () => {
+    loading.elem().hide();
+  };
+  loading.show = () => {
+    loading.elem().show();
+  };
   return loading;
 }
 
@@ -91,7 +100,7 @@ export function CreateAlerts(max?: number): mjAlerts {
   alerts.max = max == undefined ? 3 : max;
   alerts.count = 0;
 
-  alerts.insertElem = (elem) => {
+  alerts.insertElem = elem => {
     $(alerts.id).prepend(elem);
     alerts.count++;
     if (alerts.max > 0 && alerts.count > alerts.max) {
@@ -107,7 +116,7 @@ export function CreateAlerts(max?: number): mjAlerts {
     }
     const elem = m('div')
       .addClass(`alert alert-${msgType} my-1`)
-      .append( m('span').text(time_and_msg) );
+      .append(m('span').text(time_and_msg));
     alerts.insertElem(elem);
   };
 
@@ -140,7 +149,6 @@ export function ajax(
   onAlways?: (that: XMLHttpRequest) => void,
   onReady?: (that: XMLHttpRequest) => void
 ): void {
-
   const handleErr = (that: XMLHttpRequest, errMsg: string) => {
     if (onFail) {
       onFail(that, errMsg);
@@ -151,13 +159,13 @@ export function ajax(
     } else {
       console.log(errMsg);
     }
-  }
+  };
 
   if (options.buttonID) disable(options.buttonID);
 
   const xhr = new XMLHttpRequest();
 
-  xhr.timeout = 10*1000;
+  xhr.timeout = 10 * 1000;
   xhr.ontimeout = () => {
     handleErr(xhr, 'timeout');
   };
@@ -174,11 +182,11 @@ export function ajax(
     handleErr(xhr, 'An error occurred during the transaction');
   };
 
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     onReady?.(this);
-  }
+  };
 
-  xhr.onload = function() {
+  xhr.onload = function () {
     if (this.status == 200) {
       onSuccess?.(this.response);
     } else {
@@ -192,7 +200,7 @@ export function ajax(
     }
   };
 
-  xhr.onloadend = function() {
+  xhr.onloadend = function () {
     if (options.buttonID) enable(options.buttonID);
     onAlways?.(this);
   };
@@ -218,24 +226,36 @@ export function ajax(
 /**
  * @param n 超时限制，单位是秒
  */
-export function ajaxPromise(options: AjaxOptions, n: number=5): Promise<any> {
+export function ajaxPromise(options: AjaxOptions, n: number = 5): Promise<any> {
   const second = 1000;
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => { reject('timeout') }, n*second);
-    ajax(options,
-      result => { resolve(result) },  // onSuccess
-      errMsg => { reject(errMsg) },   // onError
-      () => { clearTimeout(timeout) } // onAlways
+    const timeout = setTimeout(() => {
+      reject('timeout');
+    }, n * second);
+    ajax(
+      options,
+      // onSuccess
+      result => {
+        resolve(result);
+      },
+      // onError
+      errMsg => {
+        reject(errMsg);
+      },
+      // onAlways
+      () => {
+        clearTimeout(timeout);
+      }
     );
   });
 }
 
-export function val(obj: mjElement | mjComponent, trim?:'trim'): string {
+export function val(obj: mjElement | mjComponent, trim?: 'trim'): string {
   let s = '';
   if ('elem' in obj) {
     s = obj.elem().val() as string;
   } else {
-    s = obj.val() as string
+    s = obj.val() as string;
   }
   if (trim) {
     return s.trim();
@@ -253,32 +273,39 @@ interface LinkOptions {
   title?: string;
   blank?: boolean;
 }
-export function LinkElem(href: string,options?:LinkOptions): mjElement {
+export function LinkElem(href: string, options?: LinkOptions): mjElement {
   if (!options) {
     return m('a').text(href).attr('href', href);
   }
-  if (!options.text) options.text = href
+  if (!options.text) options.text = href;
   const link = m('a').text(options.text).attr('href', href);
   if (options.title) link.attr('title', options.title);
   if (options.blank) link.attr('target', '_blank');
   return link;
 }
 
-export function create_textarea(rows: number=3): mjComponent {
-  return cc('textarea', {classes:'form-textarea', attr:{'rows': rows}});
+export function create_textarea(rows: number = 3): mjComponent {
+  return cc('textarea', {classes: 'form-textarea', attr: {rows: rows}});
 }
-export function create_input(type:string='text'): mjComponent {
-  return cc('input', {attr:{type:type}});
+export function create_input(type: string = 'text'): mjComponent {
+  return cc('input', {attr: {type: type}});
 }
-export function create_item(comp: mjComponent, name: string, description: string, classes='mb-3'): mjElement {
-  return m('div').addClass(classes).append(
-    m('label').addClass('form-label').attr({for:comp.raw_id}).text(name),
-    m(comp).addClass('form-textinput form-textinput-fat'),
-    m('div').addClass('form-text').text(description),
-  );
+export function create_item(
+  comp: mjComponent,
+  name: string,
+  description: string,
+  classes = 'mb-3'
+): mjElement {
+  return m('div')
+    .addClass(classes)
+    .append(
+      m('label').addClass('form-label').attr({for: comp.raw_id}).text(name),
+      m(comp).addClass('form-textinput form-textinput-fat'),
+      m('div').addClass('form-text').text(description)
+    );
 }
 
-export function badge(name:string): mjElement {
+export function badge(name: string): mjElement {
   return span(name).addClass('badge-grey');
 }
 
