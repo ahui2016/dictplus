@@ -10,9 +10,10 @@ const Alerts = util.CreateAlerts();
 const Title = cc('h1', {text: 'Add a new item'});
 
 const ViewBtn = cc('a', {text: 'View', classes: 'ml-2'});
+const EditBtn = cc('a', {text: 'Edit', classes: 'ml-2'});
 const naviBar = m('div')
   .addClass('text-right')
-  .append(util.LinkElem('/', {text: 'Home'}), m(ViewBtn).hide());
+  .append(util.LinkElem('/', {text: 'Home'}), m(EditBtn).hide(), m(ViewBtn).hide());
 
 const CN_Input = util.create_input();
 const EN_Input = util.create_input();
@@ -83,11 +84,15 @@ const Form = cc('form', {
             resp => {
               wordID = (resp as util.Text).message;
               warningIfNoKana(body, Alerts);
+              warningIfNoLabel(body, Alerts);
               Alerts.insert('success', `添加项目成功 (id:${wordID})`);
               Form.elem().hide();
               ViewBtn.elem()
                 .show()
                 .attr({href: '/public/word-info.html?id=' + wordID});
+              EditBtn.elem()
+                .show()
+                .attr({href: '/public/edit-word.html?id=' + wordID});
             }
           );
         }),
@@ -106,6 +111,7 @@ const Form = cc('form', {
               },
               () => {
                 warningIfNoKana(body, SubmitAlerts);
+                warningIfNoLabel(body, SubmitAlerts);
                 SubmitAlerts.insert('success', '更新成功');
               }
             );
@@ -269,5 +275,11 @@ function getFormWord(): util.Word {
 function warningIfNoKana(w: util.Word, alerts: util.mjAlerts): void {
   if (w.JP && !w.Kana) {
     alerts.insert('primary', '提醒：有 JP 但没有 Kana');
+  }
+}
+
+function warningIfNoLabel(w: util.Word, alerts: util.mjAlerts): void {
+  if (!w.Label) {
+    alerts.insert('primary', '提醒：没有 Label, 建议填写 Label, 这对知识管理非常重要');
   }
 }
