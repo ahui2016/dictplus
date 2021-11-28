@@ -276,10 +276,14 @@ function WordItem(w) {
         ['CN', 'EN', 'JP', 'Other'].forEach(lang => {
             const word = w;
             if (word[lang]) {
+                const theWord = span(word[lang]);
+                if (lang == 'JP' && !!w.Kana) {
+                    theWord.attr('title', w.Kana);
+                }
                 self
                     .elem()
                     .find('.WordLangs')
-                    .append(span(lang + ': ').addClass('text-grey'), word[lang], ' ');
+                    .append(span(lang + ': ').addClass('text-grey'), theWord, ' ');
             }
         });
         if (w.Notes) {
