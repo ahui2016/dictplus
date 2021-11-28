@@ -14,12 +14,16 @@ import (
 )
 
 const (
-	NewWordsLimit        = 30
-	LabelsLimit          = 30
-	HistoryLimit         = 30
-	defaultDictplusAddr  = "127.0.0.1:80"
-	defaultLocaltagsAddr = "http://127.0.0.1:53549"
+	NewWordsLimit = 30
+	LabelsLimit   = 30
+	HistoryLimit  = 30
 )
+
+var defaultSettings = Settings{
+	DictplusAddr:  "127.0.0.1:80",
+	LocaltagsAddr: "http://127.0.0.1:53549",
+	Delay:         true,
+}
 
 type (
 	Word     = model.Word
@@ -53,10 +57,8 @@ func (db *DB) Open(dbPath string) (err error) {
 	e1 := initFirstID(word_id_key, word_id_prefix, db.DB)
 	e2 := db.initTextEntry(history_id_key, "")
 	e3 := db.initTextEntry(recent_labels_key, "")
-	e4 := db.initTextEntry(dictplus_addr_key, defaultDictplusAddr)
-	e5 := db.initTextEntry(localtags_addr_key, defaultLocaltagsAddr)
-	e6 := db.initIntEntry(delay_key, 1)
-	return util.WrapErrors(e1, e2, e3, e4, e5, e6)
+	e4 := db.initSettings(defaultSettings)
+	return util.WrapErrors(e1, e2, e3, e4)
 }
 
 func (db *DB) GetWordByID(id string) (w Word, err error) {

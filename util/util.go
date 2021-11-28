@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -72,6 +73,25 @@ func Base64Encode(data []byte) string {
 // Base64Decode .
 func Base64Decode(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
+}
+
+// Marshal64 converts data to json and encodes to base64 string.
+func Marshal64(data interface{}) (string, error) {
+	dataJSON, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return Base64Encode(dataJSON), err
+}
+
+// Unmarshal64_Wrong 是一个错误的的函数，不可使用！
+// 因为 value 是值，不是指针，因此 &value 无法传出去。
+func Unmarshal64_Wrong(data64 string, value interface{}) error {
+	data, err := Base64Decode(data64)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, &value)
 }
 
 // StringIndex returns the index of a string in the slice, case-insensitivly.

@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 
 	"ahui2016.github.com/dictplus/model"
 	"ahui2016.github.com/dictplus/stmt"
@@ -13,9 +14,9 @@ const (
 	word_id_prefix     = "W"
 	history_id_key     = "history-id-key"    // 搜索历史，用换行符分隔
 	recent_labels_key  = "recent-labels-key" // 最近标签，用换行符分隔
-	delay_key          = "delay-key"         // 设定后端是否延迟
 	dictplus_addr_key  = "dictplus-address"
 	localtags_addr_key = "localtags-address"
+	settings_key       = "settings-key"
 )
 
 func getTextValue(key string, tx TX) (value string, err error) {
@@ -49,14 +50,14 @@ func getCurrentID(key string, tx TX) (id model.ShortID, err error) {
 }
 
 func initFirstID(key, prefix string, tx TX) (err error) {
-	_, err = getCurrentID(key, tx)
-	if err == sql.ErrNoRows {
-		id, err1 := model.FirstID(prefix)
-		if err1 != nil {
-			return err1
-		}
-		_, err = tx.Exec(stmt.InsertTextValue, key, id.String())
+	if _, err = getCurrentID(key, tx); err != sql.ErrNoRows {
+		return err
 	}
+	id, err := model.FirstID(prefix)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(stmt.InsertTextValue, key, id.String())
 	return
 }
 
@@ -71,19 +72,43 @@ func getNextID(tx TX, key string) (nextID string, err error) {
 }
 
 func (db *DB) initTextEntry(k, v string) error {
-	_, err := getTextValue(k, db.DB)
-	if err == sql.ErrNoRows {
-		err = db.Exec(stmt.InsertTextValue, k, v)
+	if _, err := getTextValue(k, db.DB); err != sql.ErrNoRows {
+		return err
 	}
-	return err
+	return db.Exec(stmt.InsertTextValue, k, v)
 }
 
 func (db *DB) initIntEntry(k string, v int64) error {
-	_, err := getIntValue(k, db.DB)
-	if err == sql.ErrNoRows {
-		err = db.Exec(stmt.InsertIntValue, k, v)
+	if _, err := getIntValue(k, db.DB); err != sql.ErrNoRows {
+		return err
 	}
-	return err
+	return db.Exec(stmt.InsertIntValue, k, v)
+}
+
+func (db *DB) initSettings(s Settings) error {
+	if _, err := getTextValue(settings_key, db.DB); err != sql.ErrNoRows {
+		return err
+	}
+	// 由于以前使用了 localtags_addr_key 和 dictplus_addr_key, 因此需要这几行兼容代码。
+	localtagsAddr, _ := getTextValue(localtags_addr_key, db.DB)
+	if localtagsAddr != "" {
+		s.LocaltagsAddr = localtagsAddr
+		if err := updateTextValue(localtags_addr_key, "", db.DB); err != nil {
+			return nil
+		}
+	}
+	dictplusAddr, _ := getTextValue(dictplus_addr_key, db.DB)
+	if dictplusAddr != "" {
+		s.DictplusAddr = dictplusAddr
+		if err := updateTextValue(dictplus_addr_key, "", db.DB); err != nil {
+			return err
+		}
+	}
+	data64, err := util.Marshal64(s)
+	if err != nil {
+		return err
+	}
+	return db.Exec(stmt.InsertTextValue, settings_key, data64)
 }
 
 func (db *DB) GetHistory() (string, error) {
@@ -106,19 +131,23 @@ func (db *DB) GetRecentLabels() (string, error) {
 	return getTextValue(recent_labels_key, db.DB)
 }
 
-func (db *DB) GetSettings() (Settings, error) {
-	addr1, e1 := getTextValue(dictplus_addr_key, db.DB)
-	addr2, e2 := getTextValue(localtags_addr_key, db.DB)
-	delay, e3 := getIntValue(delay_key, db.DB)
-
-	return Settings{
-		DictplusAddr: addr1, LocaltagsAddr: addr2, Delay: util.IntToBool(delay),
-	}, util.WrapErrors(e1, e2, e3)
+func (db *DB) GetSettings() (s Settings, err error) {
+	data64, err := getTextValue(settings_key, db.DB)
+	if err != nil {
+		return s, err
+	}
+	data, err := util.Base64Decode(data64)
+	if err != nil {
+		return s, err
+	}
+	err = json.Unmarshal(data, &s)
+	return
 }
 
 func (db *DB) UpdateSettings(s Settings) error {
-	e1 := updateTextValue(dictplus_addr_key, s.DictplusAddr, db.DB)
-	e2 := updateTextValue(localtags_addr_key, s.LocaltagsAddr, db.DB)
-	e3 := updateIntValue(delay_key, util.BoolToInt(s.Delay), db.DB)
-	return util.WrapErrors(e1, e2, e3)
+	data64, err := util.Marshal64(s)
+	if err != nil {
+		return err
+	}
+	return updateTextValue(settings_key, data64, db.DB)
 }
