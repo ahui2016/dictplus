@@ -26,9 +26,7 @@ const Hint = cc('div', {
       m('li').text(
         '第一个分隔符前的第一个词被视为大类（比如上面例子中的 "编程"），后面的各个词都是小类（比如上面例子中的 "数据库" 和 "sql"）'
       ),
-      m('li').text(
-        '一般建议采用 Starts With 方式，如果搜不到词条，会自动切换成 Contains 方式。'
-      )
+      m('li').text('一般建议采用 Starts With 方式，如果搜不到词条，会自动切换成 Contains 方式。')
     ),
   ],
 });
@@ -96,7 +94,9 @@ const SearchForm = cc('form', {
             SearchInput.elem().trigger('focus');
             return;
           }
-          let href = `/public/index.html/?mode=${getChecked()}&search=${encodeURIComponent(pattern)}`;
+          let href = `/public/index.html/?mode=${getChecked()}&search=${encodeURIComponent(
+            pattern
+          )}`;
           if (parseInt(util.val(LimitInput), 10) != PageLimit) {
             href += `&limit=${util.val(LimitInput)}`;
           }
@@ -124,6 +124,25 @@ const AllLabelsArea = cc('div', {
   children: [m('h3').text('All Labels (全部标签)'), m('hr'), m(AllLabelsList).addClass('mt-3')],
 });
 
+const EmptyLabelBtn = cc('button', {text: '无标签', classes: 'btn'});
+const EmptyLabelArea = cc('div', {
+  children: [
+    m('h3').text('No Label (无标签)'),
+    m('hr'),
+    m('p').addClass('mt-3').text('点击下面的按钮可列出无标签的词条'),
+    m('p').append(
+      m(EmptyLabelBtn).on('click', e => {
+        e.preventDefault();
+        let href = `/public/index.html/?mode=EmptyLabel&search=abc`;
+        if (parseInt(util.val(LimitInput), 10) != PageLimit) {
+          href += `&limit=${util.val(LimitInput)}`;
+        }
+        location.href = href;
+      })
+    ),
+  ],
+});
+
 $('#root').append(
   titleArea,
   naviBar,
@@ -134,7 +153,8 @@ $('#root').append(
   m(SearchForm).addClass('my-5').hide(),
   m(MainLabelsArea).addClass('my-5').hide(),
   m(SubLabelsArea).addClass('my-5').hide(),
-  m(AllLabelsArea).addClass('my-5').hide()
+  m(AllLabelsArea).addClass('my-5').hide(),
+  m(EmptyLabelArea).addClass('my-5').hide()
 );
 
 init();
@@ -147,7 +167,11 @@ function initMainLabels(): void {
   util.ajax(
     {method: 'GET', url: '/api/get-all-labels', alerts: Alerts},
     resp => {
-      const allLabels = (resp as string[]).filter(x => !!x);
+      let allLabels = resp as string[];
+      if (allLabels.includes('')) {
+        EmptyLabelArea.elem().show();
+      }
+      allLabels = allLabels.filter(x => !!x);
       if (!resp || allLabels.length == 0) {
         Alerts.insert('danger', '数据库中还没有标签，请在添加或编辑词条时在 Label 栏填写内容。');
         return;

@@ -126,6 +126,9 @@ function searchWords(pattern, limit) {
     if (search) {
         body.fields = ['SearchByLabel', mode];
     }
+    if (mode == 'EmptyLabel') {
+        body.fields = ['SearchByEmptyLabel'];
+    }
     util.ajax({
         method: 'POST',
         url: '/api/search-words',
@@ -163,7 +166,10 @@ function searchWords(pattern, limit) {
         SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
         ResultTitle.elem().text('Results (结果)');
         let successMsg = '';
-        if (search) {
+        if (mode == 'EmptyLabel') {
+            successMsg = 'Search by EmptyLabel';
+        }
+        else if (search) {
             successMsg = `Search by label ${mode} [${pattern}]`;
         }
         else {
@@ -193,22 +199,27 @@ const Footer = cc('div', {
 $('#root').append(titleArea, m(NaviBar), m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(SearchForm).addClass('my-5').hide(), m(HistoryArea).addClass('my-5').hide(), m(RecentLabelsArea).addClass('my-5').hide(), m(ResultTitle).hide(), m(ResultAlerts), m(HR).hide(), m(WordList).addClass('mt-3'), m(Footer).addClass('my-5'));
 init();
 function init() {
-    if (!search) {
-        count_words();
-        initNewWords();
-        initHistory();
-        initLabels();
-    }
-    else {
+    if (mode || search) {
         Loading.hide();
         SubTitle.elem().text('Label 高级搜索结果专用页面');
         NaviBar.elem().hide();
         initSearchByLabel();
     }
+    else {
+        count_words();
+        initNewWords();
+        initHistory();
+        initLabels();
+    }
 }
 function initSearchByLabel() {
     Alerts.insert('primary', '可按浏览器的后退键回到 Search by Label 页面重新搜索');
-    Alerts.insert('primary', `正在采用 ${mode} 方式检索 Label[${search}]...`);
+    if (mode == 'EmptyLabel') {
+        Alerts.insert('primary', `正在采用 ${mode} 方式列出无标签的词条...`);
+    }
+    else {
+        Alerts.insert('primary', `正在采用 ${mode} 方式检索 Label[${search}]...`);
+    }
     ResultTitle.elem().show().text('Results (结果)');
     HR.elem().show();
     search = decodeURIComponent(search);

@@ -61,3 +61,6 @@ const NewWords = `SELECT * FROM word ORDER BY ctime DESC LIMIT ?;`
 
 const GetByLabel = `
 	SELECT * FROM word WHERE label LIKE ? ORDER BY ctime DESC LIMIT ?;`
+
+const GetByEmptyLabel = `
+	SELECT * FROM word WHERE label='' ORDER BY ctime DESC LIMIT ?;`

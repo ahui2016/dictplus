@@ -175,7 +175,9 @@ func (db *DB) GetWords(pattern string, fields []string, limit int) (words []Word
 
 	query := "SELECT * FROM word where"
 
-	if fields[0] == "SearchByLabel" {
+	if fields[0] == "SearchByEmptyLabel" {
+		rows, err = db.DB.Query(stmt.GetByEmptyLabel, limit)
+	} else if fields[0] == "SearchByLabel" {
 		rows, err = db.getWordsByLabel(fields[1], pattern, limit)
 	} else if fields[0] == "Recently-Added" {
 		rows, err = db.DB.Query(stmt.NewWords, NewWordsLimit)

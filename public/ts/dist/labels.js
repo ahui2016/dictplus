@@ -97,14 +97,34 @@ const AllLabelsArea = cc('div', {
     classes: 'LabelsArea',
     children: [m('h3').text('All Labels (全部标签)'), m('hr'), m(AllLabelsList).addClass('mt-3')],
 });
-$('#root').append(titleArea, naviBar, m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(Hint).addClass('my-3').hide(), m(SearchForm).addClass('my-5').hide(), m(MainLabelsArea).addClass('my-5').hide(), m(SubLabelsArea).addClass('my-5').hide(), m(AllLabelsArea).addClass('my-5').hide());
+const EmptyLabelBtn = cc('button', { text: '无标签', classes: 'btn' });
+const EmptyLabelArea = cc('div', {
+    children: [
+        m('h3').text('No Label (无标签)'),
+        m('hr'),
+        m('p').addClass('mt-3').text('点击下面的按钮可列出无标签的词条'),
+        m('p').append(m(EmptyLabelBtn).on('click', e => {
+            e.preventDefault();
+            let href = `/public/index.html/?mode=EmptyLabel&search=abc`;
+            if (parseInt(util.val(LimitInput), 10) != PageLimit) {
+                href += `&limit=${util.val(LimitInput)}`;
+            }
+            location.href = href;
+        })),
+    ],
+});
+$('#root').append(titleArea, naviBar, m(LimitInputArea).hide(), m(Loading).addClass('my-5'), m(Alerts).addClass('my-5'), m(Hint).addClass('my-3').hide(), m(SearchForm).addClass('my-5').hide(), m(MainLabelsArea).addClass('my-5').hide(), m(SubLabelsArea).addClass('my-5').hide(), m(AllLabelsArea).addClass('my-5').hide(), m(EmptyLabelArea).addClass('my-5').hide());
 init();
 function init() {
     initMainLabels();
 }
 function initMainLabels() {
     util.ajax({ method: 'GET', url: '/api/get-all-labels', alerts: Alerts }, resp => {
-        const allLabels = resp.filter(x => !!x);
+        let allLabels = resp;
+        if (allLabels.includes('')) {
+            EmptyLabelArea.elem().show();
+        }
+        allLabels = allLabels.filter(x => !!x);
         if (!resp || allLabels.length == 0) {
             Alerts.insert('danger', '数据库中还没有标签，请在添加或编辑词条时在 Label 栏填写内容。');
             return;

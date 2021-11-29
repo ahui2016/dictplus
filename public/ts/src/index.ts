@@ -143,6 +143,9 @@ function searchWords(pattern: string, limit: number): void {
   if (search) {
     body.fields = ['SearchByLabel', mode];
   }
+  if (mode == 'EmptyLabel') {
+    body.fields = ['SearchByEmptyLabel'];
+  }
   util.ajax(
     {
       method: 'POST',
@@ -182,7 +185,9 @@ function searchWords(pattern: string, limit: number): void {
       SearchAlerts.insert('success', `找到 ${words.length} 条结果`);
       ResultTitle.elem().text('Results (结果)');
       let successMsg = '';
-      if (search) {
+      if (mode == 'EmptyLabel') {
+        successMsg = 'Search by EmptyLabel';
+      } else if (search) {
         successMsg = `Search by label ${mode} [${pattern}]`;
       } else {
         successMsg = `Search [${pattern}] in ${body.fields.join(', ')}`;
@@ -231,22 +236,26 @@ $('#root').append(
 init();
 
 function init() {
-  if (!search) {
-    count_words();
-    initNewWords();
-    initHistory();
-    initLabels();
-  } else {
+  if (mode || search) {
     Loading.hide();
     SubTitle.elem().text('Label 高级搜索结果专用页面');
     NaviBar.elem().hide();
     initSearchByLabel();
+  } else {
+    count_words();
+    initNewWords();
+    initHistory();
+    initLabels();
   }
 }
 
 function initSearchByLabel(): void {
   Alerts.insert('primary', '可按浏览器的后退键回到 Search by Label 页面重新搜索');
-  Alerts.insert('primary', `正在采用 ${mode} 方式检索 Label[${search}]...`);
+  if (mode == 'EmptyLabel') {
+    Alerts.insert('primary', `正在采用 ${mode} 方式列出无标签的词条...`);
+  } else {
+    Alerts.insert('primary', `正在采用 ${mode} 方式检索 Label[${search}]...`);
+  }
 
   ResultTitle.elem().show().text('Results (结果)');
   HR.elem().show();
@@ -330,8 +339,8 @@ function WordItem(w: util.Word): mjComponent {
       if (word[lang]) {
         const theWord = span(word[lang]);
         if (lang == 'JP' && !!w.Kana) {
-          theWord.attr('title', w.Kana)
-        } 
+          theWord.attr('title', w.Kana);
+        }
         self
           .elem()
           .find('.WordLangs')
