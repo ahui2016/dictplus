@@ -34,6 +34,7 @@ func main() {
 	api.GET("/get-recent-labels", getRecentLabels)
 	api.GET("/get-settings", getSettingsHandler)
 	api.POST("/update-settings", updateSettings)
+	api.GET("/download-db", downloadDB)
 
 	e.Logger.Fatal(e.Start(*addr))
 }

@@ -47,6 +47,10 @@ func jsFile(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func downloadDB(c echo.Context) error {
+	return c.Attachment(dbFileName, dbFileName)
+}
+
 func errorHandler(err error, c echo.Context) {
 	if e, ok := err.(*echo.HTTPError); ok {
 		c.JSON(e.Code, e.Message)
