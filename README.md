@@ -61,6 +61,7 @@
 ## 备份
 
 - 第一次运行程序后，会在程序所在文件夹内自动生成 db-dictplus.sqlite 文件，只要备份这一个文件即可。
+- 在 Settings 页面也可下载 db-dictplus.sqlite 文件。
 - 以后会增加将整个数据库导出为一个 json 文件的功能。
 
 ## 更新
