@@ -213,7 +213,7 @@ const Footer = cc('div', {
   children: [
     // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
     m('br'),
-    span('version: 2021-11-27').addClass('text-grey'),
+    span('version: 2021-11-29').addClass('text-grey'),
   ],
 });
 
