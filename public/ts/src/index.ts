@@ -69,7 +69,7 @@ const HistoryArea = cc('div', {
   children: [m('h3').text('History (检索历史)'), m('hr'), m(HistoryItems)],
 });
 
-const AllLabelsBtn = cc('button', {text: 'all labels', classes: '.btn ml-3'});
+const AllLabelsBtn = cc('button', {text: 'all labels', classes: 'btn ml-3'});
 AllLabelsBtn.init = () => {
   AllLabelsBtn.elem().on('click', e => {
     e.preventDefault();

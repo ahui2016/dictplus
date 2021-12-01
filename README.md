@@ -3,7 +3,7 @@
 
 ## 更新记录
 
-这里是简单记录最近的更新情况，更详细的更新说明请看 [Releases](https://github.com/ahui2016/dictplus/releases)
+这里只是简单记录最近的更新情况，更详细的更新说明请看 [Releases](https://github.com/ahui2016/dictplus/releases)
 
 - `2021-11-29` 添加了 Delay 选项、"无标签"按钮、数据库文件下载按钮
 - `2021-11-27` 修复了 [issues/1](https://github.com/ahui2016/dictplus/issues/1), 另外 Label 高级搜索增加了自动切换模式功能
