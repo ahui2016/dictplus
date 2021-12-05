@@ -30,7 +30,7 @@
   $ cd ~
   $ git clone https://github.com/ahui2016/dictplus.git
   $ cd dictplus
-  $ git checkout tags/2021-11-29 -b 2021-11-29
+  $ git checkout tags/2021-12-05 -b 2021-12-05
   $ go build
   $ ./dictplus
   ```
@@ -73,7 +73,7 @@
   ```
   $ cd ~/dictplus
   $ git pull
-  $ git checkout tags/2021-11-29 -b 2021-11-29
+  $ git checkout tags/2021-12-05 -b 2021-12-05
   $ go build
   $ ./dictplus
   ```
