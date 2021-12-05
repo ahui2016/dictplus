@@ -3,3 +3,4 @@ db-dictplus.sqlite
 *.exe
 node_modules
 *.zip
+to_temp.yaml

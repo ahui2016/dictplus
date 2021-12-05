@@ -108,7 +108,7 @@ func addAndLimit(item, items string, limit int) string {
 }
 
 func addOrMoveToTop(items []string, item string) []string {
-	i := util.StringIndexNoCase(items, item)
+	i := util.StrIndexNoCase(items, item)
 	if i == 0 {
 		return items
 	}

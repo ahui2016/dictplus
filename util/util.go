@@ -94,9 +94,9 @@ func Unmarshal64_Wrong(data64 string, value interface{}) error {
 	return json.Unmarshal(data, &value)
 }
 
-// StringIndex returns the index of a string in the slice, case-insensitivly.
+// StrIndexNoCase returns the index of a string in the slice, case-insensitivly.
 // returns -1 if not found.
-func StringIndexNoCase(slice []string, item string) int {
+func StrIndexNoCase(slice []string, item string) int {
 	item = strings.ToLower(item)
 	for i, v := range slice {
 		if strings.ToLower(v) == item {

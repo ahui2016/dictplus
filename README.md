@@ -5,6 +5,7 @@
 
 这里只是简单记录最近的更新情况，更详细的更新说明请看 [Releases](https://github.com/ahui2016/dictplus/releases)
 
+- `2021-12-05` 修复了一个 html 标签注入的 bug (由于本软件是本地单用户使用，因此这个 bug 不算严重)
 - `2021-11-29` 添加了 Delay 选项、"无标签"按钮、数据库文件下载按钮
 - `2021-11-27` 修复了 [issues/1](https://github.com/ahui2016/dictplus/issues/1), 另外 Label 高级搜索增加了自动切换模式功能
 - `2021-11-26` 添加了 Label 高级搜索页面（当最近标签超过 10 个时才会出现入口）, 添加了 gitee 仓库方便国内使用

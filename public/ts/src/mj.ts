@@ -1,5 +1,8 @@
 // 受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
 
+// 安全提醒：使用 mjElement.append() 时，如果直接 append 字符串是可以注入 html 的，
+// 因此要特别小心，可以考虑用 span() 来包裹字符串。
+
 export type mjElement = JQuery<HTMLElement>;
 
 export interface mjComponent {

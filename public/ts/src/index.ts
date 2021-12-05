@@ -213,7 +213,7 @@ const Footer = cc('div', {
   children: [
     // util.LinkElem('https://github.com/ahui2016/dictplus',{blank:true}),
     m('br'),
-    span('version: 2021-11-29').addClass('text-grey'),
+    span('version: 2021-12-05').addClass('text-grey'),
   ],
 });
 
@@ -348,7 +348,7 @@ function WordItem(w: util.Word): mjComponent {
       }
     });
     if (w.Notes) {
-      self.elem().find('.WordNotes').show().append(limited_notes(w.Notes)).addClass('text-grey');
+      self.elem().find('.WordNotes').show().addClass('text-grey').text(limited_notes(w.Notes));
     }
   };
   return self;

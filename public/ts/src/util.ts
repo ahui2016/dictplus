@@ -116,7 +116,7 @@ export function CreateAlerts(max?: number): mjAlerts {
     }
     const elem = m('div')
       .addClass(`alert alert-${msgType} my-1`)
-      .append(m('span').text(time_and_msg));
+      .append(span(time_and_msg));
     alerts.insertElem(elem);
   };
 
