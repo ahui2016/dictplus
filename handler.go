@@ -145,7 +145,7 @@ func getHistoryHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(OK, strings.Fields(history))
+	return c.JSON(OK, strings.Split(history, "\n"))
 }
 
 func updateHistory(c echo.Context) error {

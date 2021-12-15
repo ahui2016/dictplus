@@ -81,7 +81,11 @@ const download_db_area = m('div').append(
   m('h3').text('Database Backup'),
   m('hr'),
   m('p').text('点击下面的链接（或右键点击“另存为”）可下载数据库文件：'),
-  m('p').append(util.LinkElem('/api/download-db', {text: 'sqlite database file'}))
+  m('p').append(
+    util
+      .LinkElem('/api/download-db', {text: 'sqlite database file'})
+      .attr({download: 'db-dictplus.sqlite'})
+  )
 );
 
 $('#root').append(
