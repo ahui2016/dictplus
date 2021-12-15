@@ -11,12 +11,14 @@
     <title>Labels - dictplus</title>
 
     <style>
-      .form-check-inline {
-        display: inline;
+      .LabelsList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
       }
 
       .LabelItem {
-        margin-bottom: 0.25rem;
+        /* margin-bottom: 0.25rem; */
         font-size: 1em !important;
         cursor: pointer !important;
       }
@@ -25,7 +27,10 @@
         text-decoration: none;
       }
 
-      .LabelItem + .LabelItem,
+      .form-check-inline {
+        display: inline;
+      }
+
       .form-check-inline + .form-check-inline {
         margin-left: 1rem;
       }

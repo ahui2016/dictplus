@@ -1,5 +1,5 @@
 // 采用受 Mithril 启发的基于 jQuery 实现的极简框架 https://github.com/ahui2016/mj.js
-import { m, cc, span, appendToList } from './mj.js';
+import { m, cc, appendToList } from './mj.js';
 import * as util from './util.js';
 let wordID = util.getUrlParam('id');
 const Loading = util.CreateLoading('center');
@@ -16,7 +16,7 @@ const JP_Input = util.create_input();
 const Kana_Input = util.create_input();
 const Other_Input = util.create_input();
 const Label_Input = util.create_input();
-const RecentLabels = cc('div');
+const RecentLabels = cc('div', { classes: 'RecentLabels' });
 const Notes_Input = util.create_textarea();
 const Links_Input = util.create_textarea();
 const Images_Input = util.create_textarea(2);
@@ -36,7 +36,7 @@ const Form = cc('form', {
         util.create_item(EN_Input, 'EN', ''),
         util.create_item(JP_Input, 'JP', ''),
         util.create_item(Kana_Input, 'Kana', '与 JP 对应的平假名，用于辅助搜索'),
-        util.create_item(Other_Input, 'Other', '其他任何语种'),
+        util.create_item(Other_Input, 'Other', '其他任何语种 或 其他信息'),
         util.create_item(Label_Input, 'Label', '一个标签，建议采用 "大类-小类" 的方式（比如 "编程-算法"），其中分割符可以是 "-" 或 "/" 或空格', 'mb-0'),
         m(RecentLabels).addClass('mb-3'),
         util.create_item(Notes_Input, 'Notes', '备注/详细描述/补充说明 等等（建议控制字数，尽量简短）'),
@@ -174,7 +174,7 @@ function initLabels() {
         if (!resp || labels.length == 0) {
             return;
         }
-        RecentLabels.elem().append(span('Recent Labels:').addClass('text-grey'));
+        // RecentLabels.elem().append(span('Recent Labels:').addClass('text-grey'));
         appendToList(RecentLabels, labels.map(LabelItem));
     });
 }

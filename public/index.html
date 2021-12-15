@@ -19,7 +19,13 @@
       display: inline;
     }
 
-    .HistoryItem + .HistoryItem,
+    .RecentLabels,
+    .HistoryItems {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 1rem;
+    }
+
     .form-check-inline + .form-check-inline {
       margin-left: 1rem;
     }

@@ -97,6 +97,7 @@ func (db *DB) InsertNewWord(w *Word) (err error) {
 }
 
 // addAndLimit adds an item into items, and limits the length of items.
+// items contains words that split by "\n".
 func addAndLimit(item, items string, limit int) string {
 	itemArr := strings.Split(items, "\n")
 	itemArr = addOrMoveToTop(itemArr, item)
@@ -109,7 +110,7 @@ func addAndLimit(item, items string, limit int) string {
 
 func addOrMoveToTop(items []string, item string) []string {
 	i := util.StrIndexNoCase(items, item)
-	if i == 0 {
+	if i <= 0 {
 		return items
 	}
 	if i > 0 {

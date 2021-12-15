@@ -53,7 +53,7 @@ const ResultTitle = cc('h3', { text: 'Recently Added (最近添加)' });
 const ResultAlerts = util.CreateAlerts(1);
 const HR = cc('hr');
 const WordList = cc('div');
-const HistoryItems = cc('div');
+const HistoryItems = cc('div', { classes: 'HistoryItems' });
 const HistoryArea = cc('div', {
     children: [m('h3').text('History (检索历史)'), m('hr'), m(HistoryItems)],
 });
@@ -64,7 +64,7 @@ AllLabelsBtn.init = () => {
         location.href = '/public/labels.html';
     });
 };
-const RecentLabels = cc('div');
+const RecentLabels = cc('div', { classes: 'RecentLabels' });
 const RecentLabelsArea = cc('div', {
     children: [m('h3').text('Recent Labels (最近标签)'), m('hr'), m(RecentLabels)],
 });

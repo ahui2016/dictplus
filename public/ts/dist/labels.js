@@ -82,17 +82,17 @@ const SearchForm = cc('form', {
         })),
     ],
 });
-const MainLabelsList = cc('div');
+const MainLabelsList = cc('div', { classes: 'LabelsList' });
 const MainLabelsArea = cc('div', {
     classes: 'LabelsArea',
     children: [m('h3').text('Main Labels (大类)'), m('hr'), m(MainLabelsList).addClass('mt-3')],
 });
-const SubLabelsList = cc('div');
+const SubLabelsList = cc('div', { classes: 'LabelsList' });
 const SubLabelsArea = cc('div', {
     classes: 'LabelsArea',
     children: [m('h3').text('Sub-Labels (小类)'), m('hr'), m(SubLabelsList).addClass('mt-3')],
 });
-const AllLabelsList = cc('div');
+const AllLabelsList = cc('div', { classes: 'LabelsList' });
 const AllLabelsArea = cc('div', {
     classes: 'LabelsArea',
     children: [m('h3').text('All Labels (全部标签)'), m('hr'), m(AllLabelsList).addClass('mt-3')],
